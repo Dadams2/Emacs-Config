@@ -50,6 +50,7 @@
  evil-want-fine-undo t          ; make undo limit bigger
  auto-save-default t            ; help with the b-s
  truncate-string-ellipsis "…"   ; is nicer
+ compilation-scroll-output t    ; warnings annoy me
  )
 
 (global-subword-mode 1)
@@ -86,10 +87,6 @@
   (map! :leader
         (:prefix-map ("c" . "code")
          "x" flycheck-command-map)))
-
-(setq meghanada-java-path "/d/sw/java64/jdk-12.0.1/bin/java")
-(setq lsp-java-java-path "/d/sw/java64/jdk-12.0.1/bin/java")
-(setq conda-anaconda-home "/d/sw/miniconda3/4.8.2/")
 
 ;; auto fullscreen
 (if (eq initial-window-system 'x)                 ; if started by emacs command or desktop file
@@ -191,4 +188,5 @@
 (add-hook 'doom-load-theme-hook #'set-appropriate-splash)
 
 
-(setq +ligatures-extras-in-modes nil)
+(setq +ligatures-extras-in-modes '(elisp-mode))
+(setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
