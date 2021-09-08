@@ -14,7 +14,6 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "David Adams"
@@ -53,6 +52,7 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
  delete-by-moving-to-trash t ; use systems trashcan
  window-combination-resize t ; take all new space
  x-stretch-cursor t          ; deal with glyphs
+ enable-local-variables t    ; I want to be able to use dir-locals
  )
 
 
@@ -68,7 +68,6 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
 
 (add-to-list 'default-frame-alist '(height . 24)) ; better frame sizing
 (add-to-list 'default-frame-alist '(width . 80))  ;
-
 
 
 (setq evil-vsplit-window-right t
@@ -198,10 +197,26 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
 (add-hook 'window-size-change-functions #'set-appropriate-splash)
 (add-hook 'doom-load-theme-hook #'set-appropriate-splash)
 
-
 (setq +ligatures-extras-in-modes '(elisp-mode))
 (setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
+
+(setq doom-fallback-buffer-name "► Doom"
+      +doom-dashboard-name "► Doom")
+
+
+(defadvice! +literate-tangle-async-h ()
+  "A very simplified version of `+literate-tangle-h', but async."
+  :override #'+literate-tangle-h
+  (let ((default-directory doom-private-dir))
+    (async-shell-command
+     (format "emacs --batch --eval \"(progn \
+(require 'org) (setq org-confirm-babel-evaluate nil) \
+(org-babel-tangle-file \\\"%s\\\"))\""
+             +literate-config-file))))
+
 #+end_src
+
+
 
 
 #+begin_src emacs-lisp :tangle "init.el" :noweb no-export :comments no
@@ -347,7 +362,7 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
        json              ; At least it ain't XML
        (java +meghanada +lsp) ; the poster child for carpal tunnel syndrome
        (javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
-       (julia +lsp)             ; a better, faster MATLAB
+       ;;(julia +lsp)             ; a better, faster MATLAB
        ;;kotlin            ; a better, slicker Java(Script)
        ;;latex             ; writing papers in Emacs has never been so fun
        ;;lean              ; for folks with too much to prove
