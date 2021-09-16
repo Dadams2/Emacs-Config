@@ -3,21 +3,56 @@
 
 * Preamble
 
-I don't really know what I am doing, but it seems fun. If you want an acutal representation of something good check out tecosaurs config.
+I don't really know what I am doing, but it seems fun. If you want an actual representation of something good check out [[https://tecosaur.github.io/emacs-config/config.html][Tecosaurs Config]].
+
 
 * The simple stuff
 
+apparently this makes things run faster (I found it [[https://nullprogram.com/blog/2016/12/22/][here]])
+#+begin_src emacs-lisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+#+end_src
+
+** Personal info
+
+From ~GPG~ to ~git~ to email clients and snippets, the following seems kinda important to have around
+#+begin_src emacs-lisp
+(setq user-full-name "David Adams"
+      user-mail-address "dbadams@iinet.net.au")
+#+end_src
+
+** Default settings
+Following in Tec's footsteps I somehow stumbled upon [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][angrybacon/dotemacs]] which gave some inspiration on better default setttings.
+
+#+begin_src emacs-lisp
+(setq-default
+ delete-by-moving-to-trash t ; its rubbish bin not trash
+ window-combination-resize t ; take all new space
+ x-stretch-cursor t          ; deal with glyphs
+ enable-local-variables t    ; I want to be able to use dir-locals
+ )
+
+
+(setq
+ undo-limit 2000000
+ evil-want-fine-undo t          ; make undo limit bigger
+ auto-save-default t            ; help with the b-s
+ truncate-string-ellipsis "…"   ; is nicer
+ compilation-scroll-output t    ; warnings annoy me
+ )
+
+(global-subword-mode 1)         ; camel case is unfortunate
+#+end_src
+
+* The rest
 #+begin_src emacs-lisp
 
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
-(setq user-full-name "David Adams"
-      user-mail-address "dbadams@iinet.net.au")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -48,23 +83,6 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
 
 ;;(setq lsp-pyright-venv-path "/node/bud82/envs/second")
 
-(setq-default
- delete-by-moving-to-trash t ; use systems trashcan
- window-combination-resize t ; take all new space
- x-stretch-cursor t          ; deal with glyphs
- enable-local-variables t    ; I want to be able to use dir-locals
- )
-
-
-(setq
- undo-limit 2000000
- evil-want-fine-undo t          ; make undo limit bigger
- auto-save-default t            ; help with the b-s
- truncate-string-ellipsis "…"   ; is nicer
- compilation-scroll-output t    ; warnings annoy me
- )
-
-(global-subword-mode 1)         ; camel case is unfortunate
 
 (add-to-list 'default-frame-alist '(height . 24)) ; better frame sizing
 (add-to-list 'default-frame-alist '(width . 80))  ;
@@ -197,7 +215,7 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
 (add-hook 'window-size-change-functions #'set-appropriate-splash)
 (add-hook 'doom-load-theme-hook #'set-appropriate-splash)
 
-(setq +ligatures-extras-in-modes '(elisp-mode))
+(setq +ligatureskextras-in-modes '(elisp-mode))
 (setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
 
 (setq doom-fallback-buffer-name "► Doom"
@@ -214,6 +232,7 @@ I don't really know what I am doing, but it seems fun. If you want an acutal rep
 (org-babel-tangle-file \\\"%s\\\"))\""
              +literate-config-file))))
 
+(setq company-idle-delay 0.01)
 #+end_src
 
 
