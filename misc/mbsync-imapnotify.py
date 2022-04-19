@@ -341,7 +341,7 @@ def main():
         + f" out of \033[1;36m{totalAccounts}\033[0;37m accounts.\n"
     )
 
-    processSystemdServices( )
+    processSystemdServices()
 
 
 if __name__ == "__main__":

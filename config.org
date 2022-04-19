@@ -1,5 +1,7 @@
 #+title: Doom Emacs Configuration
 #+author: Dadams
+# #+property: header-args:emacs-lisp :tangle yes :comments link
+# #+property: header-args:elisp :exports code
 
 * Preamble
 
@@ -314,7 +316,7 @@ emacs-lisp        ; drown in parentheses
 ;;hy                ; readability of scheme w/ speed of python
 ;;idris             ; a language you can depend on
 json              ; At least it ain't XML
-(java +meghanada +lsp) ; the poster child for carpal tunnel syndrome
+(java +lsp) ; the poster child for carpal tunnel syndrome
 (javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
 ;;(julia +lsp)             ; a better, faster MATLAB
 ;;kotlin            ; a better, slicker Java(Script)
@@ -328,6 +330,8 @@ markdown          ; writing docs for people to ignore
 ;;ocaml             ; an objective camel
 (org
 +pretty
++pandoc
++present
 +jupyter)                                ; organize your plain life in plain text
 ;;php               ; perl's insecure younger brother
 ;;plantuml          ; diagrams for confusing people more
@@ -379,6 +383,8 @@ everywhere        ; *leave* Emacs!? You must be joking
 *** General Visual
 
 **** Fonts
+
+I am a big fan of 'Fira Code'. Font sizes do need some fiddling to get it all right.
 #+begin_src emacs-lisp
 (setq doom-font (font-spec :family "Fira Code Nerd Font" :size 16)
       doom-big-font (font-spec :family "Fira Code Nerd Font" :size 24)
@@ -388,7 +394,55 @@ everywhere        ; *leave* Emacs!? You must be joking
       )
 
 #+end_src
-watch this space
+
+***** Missing Fonts
+
+Warning about missing fonts is a bit of a problem especially if you are coming to a new system.
+The following code (once again shamelessly ripped from Tec) makes it slightly more nice.
+#+name: detect-missing-fonts
+#+begin_src emacs-lisp :tangle no
+(defvar required-fonts      '("Fira Code*" "Overpass" "JuliaMono" "IBM Plex Mono" "Merriweather" "Alegreya"))
+
+(defvar available-fonts
+  (delete-dups (or (font-family-list)
+                   (split-string (shell-command-to-string "fc-list : family")
+                                 "[,\n]"))))
+
+(defvar missing-fonts
+  (delq nil (mapcar
+             (lambda (font)
+               (unless (delq nil (mapcar (lambda (f)
+                                           (string-match-p (format "^%s$" font) f))
+                                         available-fonts))
+                 font))
+             required-fonts)))
+
+(if missing-fonts
+    (pp-to-string
+     `(unless noninteractive
+        (add-hook! 'doom-init-ui-hook
+          (run-at-time nil nil
+                       (lambda ()
+                         (message "%s missing the following fonts: %s"
+                                  (propertize "Warning!" 'face '(bold warning))
+                                  (mapconcat (lambda (font)
+                                               (propertize font 'face 'font-lock-variable-name-face))
+                                             ',missing-fonts
+                                             ", "))
+                         (sleep-for 0.5))))))
+  ";; No missing fonts detected")
+#+end_src
+
+#+begin_src emacs-lisp :noweb no-export
+<<detect-missing-fonts()>>
+#+end_src
+***** Fixing icons
+
+Some icons such as       (should see a windows icon, up down arrows a clock and a calendar not rain clouds a rain drop or stars) can appear to be incorrect depending on what font doom uses for unicode rendering.
+This can make things difficult if you are working on something that renders them differently.
+#+begin_src emacs-lisp
+    (setq doom-unicode-font (font-spec :family "Fira Code Nerd Font"))
+#+end_src
 
 **** Theme and modeline
 
@@ -445,16 +499,62 @@ courtesy of Tec once again, as literate config files get big and tangling is blo
 having a simple async version seems like a good idea
 
 #+begin_src emacs-lisp
+(defvar +literate-tangle--proc nil)
+(defvar +literate-tangle--proc-start-time nil)
 
 (defadvice! +literate-tangle-async-h ()
-"A very simplified version of `+literate-tangle-h', but async."
-:override #'+literate-tangle-h
-(let ((default-directory doom-private-dir))
-(async-shell-command
-(format "emacs --batch --eval \"(progn \
-(require 'org) (setq org-confirm-babel-evaluate nil) \
-(org-babel-tangle-file \\\"%s\\\"))\""
-+literate-config-file))))
+  "A very simplified version of `+literate-tangle-h', but async."
+  :override #'+literate-tangle-h
+  (unless (getenv "__NOTANGLE")
+    (let ((default-directory doom-private-dir))
+      (when +literate-tangle--proc
+        (message "Killing outdated tangle process...")
+        (set-process-sentinel +literate-tangle--proc #'ignore)
+        (kill-process +literate-tangle--proc)
+        (sit-for 0.3)) ; ensure the message is seen for a bit
+      (setq +literate-tangle--proc-start-time (float-time)
+            +literate-tangle--proc
+            (start-process "tangle-config"
+                           (get-buffer-create " *tangle config*")
+                           "emacs" "--batch" "--eval"
+                           (format "(progn \
+(require 'ox) \
+(require 'ob-tangle) \
+(setq org-confirm-babel-evaluate nil \
+      org-inhibit-startup t \
+      org-mode-hook nil \
+      write-file-functions nil \
+      before-save-hook nil \
+      after-save-hook nil \
+      vc-handled-backends nil \
+      org-startup-folded nil \
+      org-startup-indented nil) \
+(org-babel-tangle-file \"%s\" \"%s\"))"
+                                   +literate-config-file
+                                   (expand-file-name (concat doom-module-config-file ".el")))))
+      (set-process-sentinel +literate-tangle--proc #'+literate-tangle--sentinel)
+      (run-at-time nil nil (lambda () (message "Tangling config.org"))) ; ensure shown after a save message
+      "Tangling config.org...")))
+
+(defun +literate-tangle--sentinel (process signal)
+  (cond
+   ((and (eq 'exit (process-status process))
+         (= 0 (process-exit-status process)))
+    (message "Tangled config.org sucessfully (took %.1fs)"
+             (- (float-time) +literate-tangle--proc-start-time))
+    (setq +literate-tangle--proc nil))
+   ((memq (process-status process) (list 'exit 'signal))
+    (+popup-buffer (get-buffer " *tangle config*"))
+    (message "Failed to tangle config.org (after %.1fs)"
+             (- (float-time) +literate-tangle--proc-start-time))
+    (setq +literate-tangle--proc nil))))
+
+(defun +literate-tangle-check-finished ()
+  (when (and (process-live-p +literate-tangle--proc)
+             (yes-or-no-p "Config is currently retangling, would you please wait a few seconds?"))
+    (switch-to-buffer " *tangle config*")
+    (signal 'quit nil)))
+(add-hook! 'kill-emacs-hook #'+literate-tangle-check-finished)
 
 #+end_src
 
@@ -570,6 +670,7 @@ Should I switch to higher resolution displays this will likely become system dep
     (toggle-frame-maximized)
   (toggle-frame-fullscreen))
 #+end_src
+#TODO: make this work with wayland
 
 * Packages
 ** Loading instructions
@@ -629,6 +730,52 @@ You can even override with a specific branch:
 (package! builtin-package :recipe (:branch "develop"))
 #+end_src
 
+
+** Convenience
+
+*** Avy
+
+Apparently this is not enabled by default and I like going to multiple places
+#+begin_src emacs-lisp
+(setq avy-all-windows 'all-frames)
+#+end_src
+
+*** Evil-escape
+
+Evil escape is disabled in ~vterm-mode~ by default. I dislike this so I will keep
+all the defaults excepting it.
+#+begin_src emacs-lisp
+(setq evil-escape-excluded-major-modes '(neotree-mode treemacs-mode))
+#+end_src
+
+*** Ligatures
+
+
+Ligature's are still an issue for me. Especially python. So I have done a bit of a blanket ignore
+till I figure out what I want
+#+begin_src emacs-lisp
+(setq +ligatures-extras-in-modes'(elisp-mode org-mode))
+(setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
+#+end_src
+
+
+*** Which-key
+
+I don't know why this is not enabled by default, but I like being able to navigate multiple pages.
+Especially if I have looked it up with =SPC h b t=.
+#+begin_src emacs-lisp
+(setq which-key-use-C-h-commands 't)
+#+end_src
+
+*** vterm
+
+I like to use tmux inside vterm and use vim bindings for navigating panes and windows.
+This simply disables the global =C-h= for help.
+#+begin_src emacs-lisp
+(map! :after vterm
+      :map vterm-mode-map
+      "C-h" #'vterm-send-C-h)
+#+end_src
 
 ** Tools
 
@@ -729,69 +876,102 @@ Having ~Ispell~ Enabled is really useful.
 
 Nothing to put here currently. Look into ~company-dabbrev-code~
 
-*   The rest
 
+*** Projectile
+
+because it faster
 #+begin_src emacs-lisp
-
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
-
-
-
 (setq projectile-indexing-method 'native)
+#+end_src
+*** flycheck
 
-
+because the default bindings are kinda dumb so everything is now =SPC c x=
+#+begin_src emacs-lisp
 (after! flycheck
 (map! :leader
 (:prefix-map ("c" . "code")
 "x" flycheck-command-map)))
-
-
-(setq evil-escape-excluded-major-modes '(neotree-mode treemacs-mode))
-;; fancy splash
-
-
-(setq +ligatureskextras-in-modes '(elisp-mode))
-(setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
-
-;; (setq forge-database-connector 'sqlite3)
-(setq gc-cons-threshold 10000000)
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
-;; (setq lsp-idle-delay 0.500)
-(setq +ligatures-in-modes 'nil)
-(setq +ligatures-extras-in-modes 'nil)
-;; (setq shell-file-name "bash")
-;; (setq shell-command-switch "-ic")
-(setq which-key-use-C-h-commands 't)
-;; (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/") )
-;; (setq
-;;   conda-env-home-directory (expand-file-name "~/.conda/")
-;;   conda-env-subdirectory "envs")
-(after! conda
-  (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/")
-        conda-env-home-directory (expand-file-name "~/.conda"))
-  )
-  (cl-flet* ((make-help-button (text help-echo)
-                               (with-temp-buffer
-                                 (insert-text-button text
-                                                     'help-echo help-echo
-                                                     'mouse-face nil)
-                                 (buffer-string)))
-             (make-help-button-cons (text1 text2 help-echo)
-                                    (cons (make-help-button text1 help-echo)
-                                          (make-help-button text2 help-echo))))
-    (setq mu4e-headers-threaded-label
-          (make-help-button-cons "T" (concat " " (all-the-icons-octicon "git-branch" :v-adjust 0.05))
-                                 "Thread view")
-          mu4e-headers-related-label
-          (make-help-button-cons "R" (concat " " (all-the-icons-material "link" :v-adjust -0.1))
-                                 "Showing related emails")
-          mu4e-headers-full-label
-          (make-help-button-cons "F" (concat " " (all-the-icons-material "disc_full"))
-                                 "Search is full!")))
-(setq avy-all-windows 'all-frames)
 #+end_src
+
+** Visuals
+
+*** Info Colors
+
+Drew Adams =info+= package is really nice but having nice colours is even better.
+#+begin_src emacs-lisp :tangle packages.el
+(package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
+#+end_src
+
+simply hook into =info=
+
+#+begin_src emacs-lisp
+(use-package! info-colors
+  :commands (info-colors-fontify-node))
+
+(add-hook 'Info-selection-hook 'info-colors-fontify-node)
+#+end_src
+
+*** Theme magic
+
+Themes are sometimes hard to match in terminals especially given settings. This is a way of helping this.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! theme-magic :pin "844c4311bd26ebafd4b6a1d72ddcc65d87f074e3")
+#+end_src
+
+# This operates using =pywal=, which is present in some repositories, but most
+# reliably installed with =pip=.
+# #+begin_src shell :eval no :tangle (if (executable-find "wal") "no" "setup.sh")
+# sudo python3 -m pip install pywal
+# #+end_src
+
+Theme magic selects 8 reasonable colours to use from font faces and other data.
+Unfortunately those 8 colours are used for both normal and light variants.
+Fortunately =doom-themes= makes things more easy as we can use the colour utils
+to generate sensible variations.
+
+#+begin_src emacs-lisp
+(use-package! theme-magic
+  :commands theme-magic-from-emacs
+  :config
+  (defadvice! theme-magic--auto-extract-16-doom-colors ()
+    :override #'theme-magic--auto-extract-16-colors
+    (list
+     (face-attribute 'default :background)
+     (doom-color 'error)
+     (doom-color 'success)
+     (doom-color 'type)
+     (doom-color 'keywords)
+     (doom-color 'constants)
+     (doom-color 'functions)
+     (face-attribute 'default :foreground)
+     (face-attribute 'shadow :foreground)
+     (doom-blend 'base8 'error 0.1)
+     (doom-blend 'base8 'success 0.1)
+     (doom-blend 'base8 'type 0.1)
+     (doom-blend 'base8 'keywords 0.1)
+     (doom-blend 'base8 'constants 0.1)
+     (doom-blend 'base8 'functions 0.1)
+     (face-attribute 'default :foreground))))
+#+end_src
+
+** File Types
+
+*** Systemd
+#+begin_src emacs-lisp :tangle packages.el
+(package! systemd)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! systemd
+  :defer t)
+#+end_src
+
+* Applications
+
+** Mail
+*** Fetching
+**** Rebuild mail index whilst using mu4e
 
 #+begin_src emacs-lisp
 (after! mu4e
@@ -845,109 +1025,32 @@ Prevents a series of redisplays from being called (when set to an appropriate va
         (when new-request
           (run-at-time (* 1.1 mu4e-reindex-request-min-seperation) nil
                        #'mu4e-reindex-maybe))))))
-(with-eval-after-load 'mu4e
-(setq mu4e-context-policy 'pick-first)
-(setq mu4e-compose-context-policy 'always-ask)
-(load! "private/email.el")
-(setq sendmail-program "/usr/bin/msmtp"
-      send-mail-function #'smtpmail-send-it
-      message-sendmail-f-is-evil t
-      message-sendmail-extra-arguments '("--read-envelope-from"); , "--read-recipients")
-      message-send-mail-function #'message-send-mail-with-sendmail)
-                )
 #+end_src
 
-#+begin_src python :tangle misc/mbsync-msmtp.py :shebang "#!/usr/bin/env python3"
-from pathlib import Path
-from dataclasses import dataclass, asdict
-from typing import List
-import json
-import shutil
-import os
+**** Config Conversions
+***** mbsync to imapnotify
 
+When run without flags this will perform the following actions
++ Read, and parse [[file:~/.mbsyncrc][~/.mbsyncrc]], specifically recognising the following properties
+  - ~IMAPAccount~
+  - ~Host~
+  - ~Port~
+  - ~User~
+  - ~Password~
+  - ~PassCmd~
+  - ~Patterns~
++ Call ~mbsync --list ACCOUNT~, and filter results according to ~Patterns~
++ Construct a imapnotify config for each account, with the following hooks
+  - onNewMail :: src_shell{mbsync --pull ACCOUNT:MAILBOX}
+  - onNewMailPost :: src_shell{if mu index --lazy-check; then test -f /tmp/mu_reindex_now && rm /tmp/mu_reindex_now; else touch /tmp/mu_reindex_now; fi}
++ Compare accounts list to previous accounts, enable/disable the relevant
+  systemd services, called with the ~--now~ flag (start/stop services as well)
 
-mbsyncFile = Path("~/.mbsyncrc").expanduser()
-msmtpFile = Path("~/.msmtprc").expanduser()
-default_port = 587
-field_map = {
-    "name": "account",
-    "host": "host",
-    "port": "port",
-    "from_address": "from",
-    "user": "user",
-    "password_expression": "passwordeval",
-}
-
-msmtpDefaults = {
-    "defaults": "",
-    "auth": "on",
-    "tls": "on",
-    "tls_trust_file": "/etc/ssl/certs/ca-certificates.crt",
-    "logfile" :"~/.msmtp.log",
-}
-
-def export_defaults(defaults):
-    return "\n".join(f"{field:<20}{value}" for field,value in msmtpDefaults.items())
-
-@dataclass(init=False)
-class MsmtpAccount:
-    name: str = ""
-    host: str = ""
-    port: int = 0
-    from_address: str = ""
-    user: str = ""
-    password_expression: str = ""
-
-    def export(self):
-        return "\n".join([f"{field_map[field]:<20}{value}" for field,value in asdict(self).items()])
-
-
-accounts: List[MsmtpAccount] = []
-
-def parse_mbsync_file():
-    cur = None
-    with open(mbsyncFile, "r") as f:
-        for line in f:
-            if(line.startswith("IMAPAccount")):
-                accounts.append(cur)
-                cur= MsmtpAccount()
-                cur.name = line.strip().split()[1]
-                cur.port = default_port
-            if(line.startswith("Host")):
-                cur.host = line.strip().split()[1].replace("imap", "smtp")
-            if(line.startswith("User")):
-                cur.from_address = line.strip().split()[1]
-                cur.user = cur.from_address.split("@")[0]
-            if(line.startswith("PassCmd")):
-                cur.password_expression = " ".join(line.strip().split()[1:])
-    accounts.append(cur)
-
-def write_file():
-    with open(msmtpFile, "w") as f:
-        f.write(export_defaults(msmtpDefaults)+"\n\n")
-        for acct in accounts:
-            if(acct != None):
-                f.write(acct.export()+"\n\n")
-        f.write(f"account default : {accounts[1].name}")
-
-def main():
-    print("\033[1;34m:: MbSync to msmtp config file creator ::\033[0;37m")
-
-    shutil.move(msmtpFile, msmtpFile.with_suffix(".old"))
-    print("\033[1;30msmtp config file moved to .msmtprc.old\033[0;37m")
-
-    parse_mbsync_file()
-    write_file()
-    print("\033[1;34m Complete \033[0;37m")
-
-
-if __name__ == "__main__":
-    main()
-
-#+end_src
-
-
-
+This script also supports the following flags
++ ~--status~ to get the status of the relevant systemd services supports =active=,
+  =failing=, and =disabled=
++ ~--enable~ to enable all relevant systemd services
++ ~--disable~ to disable all relevant systemd services
 #+begin_src python :tangle misc/mbsync-imapnotify.py :shebang "#!/usr/bin/env python3"
 from pathlib import Path
 import json
@@ -1291,17 +1394,105 @@ def main():
         + f" out of \033[1;36m{totalAccounts}\033[0;37m accounts.\n"
     )
 
-    processSystemdServices( )
+    processSystemdServices()
 
 
 if __name__ == "__main__":
     main()
 #+end_src
 
-#+RESULTS:
+***** mbsync to msmtp
+
+#+begin_src python :tangle misc/mbsync-msmtp.py :shebang "#!/usr/bin/env python3"
+from pathlib import Path
+from dataclasses import dataclass, asdict
+from typing import List
+import json
+import shutil
+import os
 
 
+mbsyncFile = Path("~/.mbsyncrc").expanduser()
+msmtpFile = Path("~/.msmtprc").expanduser()
+default_port = 587
+field_map = {
+    "name": "account",
+    "host": "host",
+    "port": "port",
+    "from_address": "from",
+    "user": "user",
+    "password_expression": "passwordeval",
+}
 
+msmtpDefaults = {
+    "defaults": "",
+    "auth": "on",
+    "tls": "on",
+    "tls_trust_file": "/etc/ssl/certs/ca-certificates.crt",
+    "logfile" :"~/.msmtp.log",
+}
+
+def export_defaults(defaults):
+    return "\n".join(f"{field:<20}{value}" for field,value in msmtpDefaults.items())
+
+@dataclass(init=False)
+class MsmtpAccount:
+    name: str = ""
+    host: str = ""
+    port: int = 0
+    from_address: str = ""
+    user: str = ""
+    password_expression: str = ""
+
+    def export(self):
+        return "\n".join([f"{field_map[field]:<20}{value}" for field,value in asdict(self).items()])
+
+
+accounts: List[MsmtpAccount] = []
+
+def parse_mbsync_file():
+    cur = None
+    with open(mbsyncFile, "r") as f:
+        for line in f:
+            if(line.startswith("IMAPAccount")):
+                accounts.append(cur)
+                cur= MsmtpAccount()
+                cur.name = line.strip().split()[1]
+                cur.port = default_port
+            if(line.startswith("Host")):
+                cur.host = line.strip().split()[1].replace("imap", "smtp")
+            if(line.startswith("User")):
+                cur.from_address = line.strip().split()[1]
+                cur.user = cur.from_address.split("@")[0]
+            if(line.startswith("PassCmd")):
+                cur.password_expression = " ".join(line.strip().split()[1:])
+    accounts.append(cur)
+
+def write_file():
+    with open(msmtpFile, "w") as f:
+        f.write(export_defaults(msmtpDefaults)+"\n\n")
+        for acct in accounts:
+            if(acct != None):
+                f.write(acct.export()+"\n\n")
+        f.write(f"account default : {accounts[1].name}")
+
+def main():
+    print("\033[1;34m:: MbSync to msmtp config file creator ::\033[0;37m")
+
+    shutil.move(msmtpFile, msmtpFile.with_suffix(".old"))
+    print("\033[1;30msmtp config file moved to .msmtprc.old\033[0;37m")
+
+    parse_mbsync_file()
+    write_file()
+    print("\033[1;34m Complete \033[0;37m")
+
+
+if __name__ == "__main__":
+    main()
+
+#+end_src
+**** Systemd Services
+A template service file so we can enable a unit per-account.
 #+begin_src systemd :tangle ~/.config/systemd/user/goimapnotify@.service
 [Unit]
 Description=IMAP notifier using IDLE, golang version.
@@ -1316,6 +1507,8 @@ RestartSec=30
 [Install]
 WantedBy=default.target
 #+end_src
+
+Enabling the service is actually taken care of by that python script.
 
 #+begin_src systemd :tangle (if (executable-find "mu") "~/.config/systemd/user/mbsync.timer" "no")
 [Unit]
@@ -1344,8 +1537,31 @@ ExecStart=/usr/bin/mbsync -c %h/.mbsyncrc --all
 WantedBy=mail.target
 #+end_src
 
-#+begin_src emacs-lisp
+Enabling (and starting) this is as simple as
+#+begin_src shell :tangle (if (or (not (executable-find "mu")) (string= "enabled\n" (shell-command-to-string "systemctl --user is-enabled mbsync.timer"))) "no" "setup.sh")
+systemctl --user enable mbsync.timer --now
+#+end_src
+*** Indexing
+*** Sending
+*** Mu4e
 
+This is here because of some weird ass property drawer errors
+#+begin_src emacs-lisp :noweb no-export :noweb-ref nil
+(after! mu4e
+  <<mu4e-conf>>
+)
+#+end_src
+
+**** Viewing Mail
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
+:END:
+Browser good for rendering not good for email applications.
+
+
+To account for the increase width of each flag character, and make perform a
+few more visual tweaks, we'll tweak the headers a bit
+#+begin_src emacs-lisp
 (setq mu4e-headers-fields
       '((:flags . 6)
         (:account-stripe . 2)
@@ -1356,22 +1572,136 @@ WantedBy=mail.target
         (:human-date . 8))
       +mu4e-min-header-frame-width 142
       mu4e-headers-date-format "%d/%m/%y"
-      mu4e-headers-time-format "?? %H:%M"
+      mu4e-headers-time-format "⧖ %H:%M"
       mu4e-headers-results-limit 1000
       mu4e-index-cleanup t)
 
-;; (add-to-list 'mu4e-bookmarks '(:name "Yesterday's messages" :query "date:2d..1d" :key ?y) t)
+(add-to-list 'mu4e-bookmarks
+             '(:name "Yesterday's messages" :query "date:2d..1d" :key ?y) t)
 
-;; (defvar +mu4e-header--folder-colors nil)
-;; (appendq! mu4e-header-info-custom
-;;           '((:folder .
-;;              (:name "Folder" :shortname "Folder" :help "Lowest level folder" :function
-;;               (lambda (msg)
-;;                 (+mu4e-colorize-str
-;;                  (replace-regexp-in-string "\\`.*/" "" (mu4e-message-field msg :maildir))
-;;                  '+mu4e-header--folder-colors))))))
+(defvar +mu4e-header--folder-colors nil)
+(appendq! mu4e-header-info-custom
+          '((:folder .
+             (:name "Folder" :shortname "Folder" :help "Lowest level folder" :function
+              (lambda (msg)
+                (+mu4e-colorize-str
+                 (replace-regexp-in-string "\\`.*/" "" (mu4e-message-field msg :maildir))
+                 '+mu4e-header--folder-colors))))))
+#+end_src
+We'll also use a nicer alert icon
+#+begin_src emacs-lisp
+;; (setq mu4e-alert-icon "/usr/share/icons/Papirus/64x64/apps/evolution.svg")
+#+end_src
+**** Sending Mail
+Let's send emails too.
+#+begin_src emacs-lisp
+(setq sendmail-program "/usr/bin/msmtp"
+      send-mail-function #'smtpmail-send-it
+      message-sendmail-f-is-evil t
+      message-sendmail-extra-arguments '("--read-envelope-from"); , "--read-recipients")
+      message-send-mail-function #'message-send-mail-with-sendmail)
 #+end_src
 
+We also want to define ~mu4e-compose-from-mailto~.
+
+#+begin_src emacs-lisp
+(defun mu4e-compose-from-mailto (mailto-string &optional quit-frame-after)
+  (require 'mu4e)
+  (unless mu4e~server-props (mu4e t) (sleep-for 0.1))
+  (let* ((mailto (message-parse-mailto-url mailto-string))
+         (to (cdr (assoc "To" mailto)))
+         (subject (or (cdr (assoc "Subject" mailto)) ""))
+         (body (cdr (assoc "Body" mailto)))
+         (headers (-filter (lambda (spec) (not (-contains-p '("To" "Subject" "Body") (car spec)))) mailto)))
+    (when-let ((mu4e-main (get-buffer mu4e-main-buffer-name)))
+      (switch-to-buffer mu4e-main))
+    (mu4e~compose-mail to subject headers)
+    (when body
+      (goto-char (point-min))
+      (if (eq major-mode 'org-msg-edit-mode)
+          (org-msg-goto-body)
+        (mu4e-compose-goto-bottom))
+      (insert body))
+    (goto-char (point-min))
+    (cond ((null to) (search-forward "To: "))
+          ((string= "" subject) (search-forward "Subject: "))
+          (t (if (eq major-mode 'org-msg-edit-mode)
+                 (org-msg-goto-body)
+               (mu4e-compose-goto-bottom))))
+    (font-lock-ensure)
+    (when evil-normal-state-minor-mode
+      (evil-append 1))
+    (when quit-frame-after
+      (add-hook 'kill-buffer-hook
+                `(lambda ()
+                   (when (eq (selected-frame) ,(selected-frame))
+                     (delete-frame)))))))
+#+end_src
+
+It would also be nice to change the name pre-filled in =From:= when drafting.
+#+begin_src emacs-lisp
+(defvar mu4e-from-name "David"
+  "Name used in \"From:\" template.")
+(defadvice! mu4e~draft-from-construct-renamed (orig-fn)
+  "Wrap `mu4e~draft-from-construct-renamed' to change the name."
+  :around #'mu4e~draft-from-construct
+  (let ((user-full-name mu4e-from-name))
+    (funcall orig-fn)))
+#+end_src
+
+We can also use this a signature,
+#+begin_src emacs-lisp
+(setq message-signature mu4e-from-name)
+#+end_src
+**** Contexts
+
+These be important
+#+begin_src emacs-lisp
+(setq mu4e-context-policy 'pick-first)
+(setq mu4e-compose-context-policy 'always-ask)
+(load! "private/email.el")
+#+end_src
+
+* Languages
+
+*   The rest
+
+#+begin_src emacs-lisp
+
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/org/")
+
+;; (setq lsp-idle-delay 0.500)
+;; (setq shell-file-name "bash")
+;; (setq shell-command-switch "-ic")
+;; (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/") )
+;; (setq
+;;   conda-env-home-directory (expand-file-name "~/.conda/")
+;;   conda-env-subdirectory "envs")
+(after! conda
+  (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/")
+        conda-env-home-directory (expand-file-name "~/.conda"))
+  )
+  (cl-flet* ((make-help-button (text help-echo)
+                               (with-temp-buffer
+                                 (insert-text-button text
+                                                     'help-echo help-echo
+                                                     'mouse-face nil)
+                                 (buffer-string)))
+             (make-help-button-cons (text1 text2 help-echo)
+                                    (cons (make-help-button text1 help-echo)
+                                          (make-help-button text2 help-echo))))
+    (setq mu4e-headers-threaded-label
+          (make-help-button-cons "T" (concat " " (all-the-icons-octicon "git-branch" :v-adjust 0.05))
+                                 "Thread view")
+          mu4e-headers-related-label
+          (make-help-button-cons "R" (concat " " (all-the-icons-material "link" :v-adjust -0.1))
+                                 "Showing related emails")
+          mu4e-headers-full-label
+          (make-help-button-cons "F" (concat " " (all-the-icons-material "disc_full"))
+                                 "Search is full!")))
+#+end_src
 
 
 #+begin_src emacs-lisp :tangle "packages.el" :comments no
@@ -1382,11 +1712,10 @@ WantedBy=mail.target
 ;; on the command line, then restart Emacs for the changes to take effect -- or
 ;; use 'M-x doom/reload'.
 
-(package! systemd)
 (package! impatient-mode)
 (package! ox-gfm)
 (package! ztree)
-
+(unpin! mu4e)
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
