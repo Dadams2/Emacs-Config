@@ -260,12 +260,12 @@ vterm             ; the best terminal emulation in Emacs
 
 **** Checkers
 
-not much to be said. Flyspell good.
+not much to be said. spell-fu seems good but the interfaces are not as nice
 #+name: doom-checkers
 #+begin_src emacs-lisp
 syntax              ; tasing you for every semicolon you forget
-(spell +flyspell) ; tasing you for misspelling mispelling
-grammar           ; tasing grammar mistake every you make
+(:if (executable-find "aspell") (spell +flyspell +aspell +everywhere)) ; tasing you for misspelling mispelling
+;;grammar           ; tasing grammar mistake every you make
 #+end_src
 
 
@@ -915,7 +915,7 @@ Also a good idea to improve memory:
 (setq-default prescient-history-length 1000)
 #+end_src
 
-**** LSP optimization
+**** LSP optimisation
 
 the following can help to see if its the language server or company that is slow.
 Its almost always garbage collection though.
@@ -948,18 +948,58 @@ because it faster
 #+begin_src emacs-lisp
 (setq projectile-indexing-method 'native)
 #+end_src
-*** flycheck
+
+*** Flycheck
 
 because the default bindings are kinda dumb so everything is now =SPC c x=
 #+begin_src emacs-lisp
 (after! flycheck
-(map! :leader
-(:prefix-map ("c" . "code")
-"x" flycheck-command-map)))
+  (map! :leader
+        (:prefix-map ("c" . "code")
+         "x" flycheck-command-map)))
 #+end_src
+
 *** Ispell
 
-Nothing too much here to worry about. Should probably enable in more places
+SCOWL provides a nice place to get dictionaries from I would like one:
+
+- size
+    80 (huge)
+- spellings
+    British(-ise) and Australian
+- spelling variants level
+    0
+- diacritics
+    keep
+- extra lists
+    hacker, roman
+
+
+**** Aspell
+
+#+begin_src shell :tangle no
+cd /tmp
+curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
+tar -xjf "aspell6-en-custom.tar.bz2"
+
+cd aspell6-en-custom
+./configure && make && sudo make install
+#+end_src
+
+
+**** Configuration
+
+Actually set the correct spelling dictionary
+#+begin_src emacs-lisp
+(setq ispell-dictionary "en-custom")
+#+end_src
+
+Also having a personal dictionary that is separate from the original is useful
+
+#+begin_src emacs-lisp
+(setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
+#+end_src
+
 *** YASnippet
 
 nested snippets are good so:
