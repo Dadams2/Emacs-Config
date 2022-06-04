@@ -1010,8 +1010,8 @@ Especially in keeping all changes.
 (after! transient
   (transient-define-prefix smerge-transient ()
     [["Move"
-      ("n" "next" (lambda () (interactive) (ignore-errors (smerge-next)) (smerge-repeatedly)))
-      ("p" "previous" (lambda () (interactive) (ignore-errors (smerge-prev)) (smerge-repeatedly)))]
+      ("n" "next" (lambda () (interactive) (ignore-errors (smerge-next)) (evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))
+      ("p" "previous" (lambda () (interactive) (ignore-errors (smerge-prev))(evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))]
      ["Keep"
       ("b" "base" (lambda () (interactive) (ignore-errors (smerge-keep-base)) (smerge-repeatedly)))
       ("u" "upper" (lambda () (interactive) (ignore-errors (smerge-keep-upper)) (smerge-repeatedly)))
