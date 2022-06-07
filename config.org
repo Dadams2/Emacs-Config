@@ -381,7 +381,7 @@ A constant work in progress. But trying to understand it does teach you a bunch.
 
 #+name: doom-email
 #+begin_src emacs-lisp
-(mu4e +gmail)
+(:if (executable-find "mu") (mu4e +gmail))
 ;;notmuch
 ;;(wanderlust +gmail)
 #+end_src
@@ -716,7 +716,7 @@ So to enable =mu4e= when actually running the daemon. Unfortunate that =circle= 
 Also make sure to switch to the dashboard.
 
 #+name: daemon initialisation
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (executable-find "mu") "yes" "no")
 (defun greedily-do-daemon-setup ()
   (require 'org)
   (when (require 'mu4e nil t)
@@ -1207,12 +1207,12 @@ Sometimes the emoji is used over the actual character when we really want the ac
 
 ** Mail
 :PROPERTIES:
-:header-args: (if not((executable-find "mu")) "tangle": no)
+:header-args: (if not((executable-find "mu")) "tangle: no")
 :END:
 *** Fetching
 **** Rebuild mail index whilst using mu4e
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle (if (executable-find "mu") "yes" "no")
 (after! mu4e
   (defvar mu4e-reindex-request-file "/tmp/mu_reindex_now"
     "Location of the reindex request, signaled by existance")
@@ -1806,18 +1806,18 @@ WantedBy=suspend.target
 *** Indexing
 *** Sending
 *** Mu4e
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
+:END:
 
-This is here because of some weird ass property drawer errors
-#+begin_src emacs-lisp :noweb no-export :noweb-ref nil
+chuck everything into one big source block and only put it in if there is mu available
+#+begin_src emacs-lisp :noweb no-export :tangle (if (executable-find "mu") "yes" "no") :noweb-ref nil
 (after! mu4e
   <<mu4e-conf>>
 )
 #+end_src
 
 **** Viewing Mail
-:PROPERTIES:
-:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
-:END:
 Browser good for rendering not good for email applications.
 
 To account for the increase width of each flag character, and make perform a
