@@ -24,6 +24,13 @@
 
 I don't really know what I am doing, but it seems fun. If you want an actual representation of something good check out [[https://tecosaur.github.io/emacs-config/config.html][Tecosaurs Config]].
 
+A note to the unweary adventurer. At no point in this config should you put the line:
+#+begin_src org :tangle no
+#+ +begin_src emacs-lisp tangle: "yes"
+#+end_src
+Org assumes the =tangle: yes= by default for all source blocks but if you manually put it there this breaks that assumption
+and no source blocks will be tangled
+
 
 * The simple stuff
 
@@ -716,7 +723,8 @@ So to enable =mu4e= when actually running the daemon. Unfortunate that =circle= 
 Also make sure to switch to the dashboard.
 
 #+name: daemon initialisation
-#+begin_src emacs-lisp :tangle (if (executable-find "mu") "yes" "no")
+#+begin_src emacs-lisp (if not((executable-find "mu")) ":tangle no")
+
 (defun greedily-do-daemon-setup ()
   (require 'org)
   (when (require 'mu4e nil t)
@@ -1206,13 +1214,9 @@ Sometimes the emoji is used over the actual character when we really want the ac
 * Applications
 
 ** Mail
-:PROPERTIES:
-:header-args: (if not((executable-find "mu")) "tangle: no")
-:END:
 *** Fetching
 **** Rebuild mail index whilst using mu4e
-
-#+begin_src emacs-lisp :tangle (if (executable-find "mu") "yes" "no")
+#+begin_src emacs-lisp (if not((executable-find "mu")) ":tangle no")
 (after! mu4e
   (defvar mu4e-reindex-request-file "/tmp/mu_reindex_now"
     "Location of the reindex request, signaled by existance")
@@ -1810,14 +1814,19 @@ WantedBy=suspend.target
 :header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
 :END:
 
-chuck everything into one big source block and only put it in if there is mu available
-#+begin_src emacs-lisp :noweb no-export :tangle (if (executable-find "mu") "yes" "no") :noweb-ref nil
+This is here because of some weird ass property drawer errors
+#+begin_src emacs-lisp :noweb no-export (if (executable-find "mu") ":tangle yes") :noweb-ref nil
 (after! mu4e
   <<mu4e-conf>>
 )
 #+end_src
 
-**** Viewing Mail
+**** Config
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
+:END:
+
+***** Viewing Mail
 Browser good for rendering not good for email applications.
 
 To account for the increase width of each flag character, and make perform a
@@ -1854,7 +1863,7 @@ We'll also use a nicer alert icon
 #+begin_src emacs-lisp
 ;; (setq mu4e-alert-icon "/usr/share/icons/Papirus/64x64/apps/evolution.svg")
 #+end_src
-***** Contexts
+****** Contexts
 
 These be important
 #+begin_src emacs-lisp
@@ -1862,7 +1871,7 @@ These be important
 (setq mu4e-compose-context-policy 'always-ask)
 (load! "private/email.el")
 #+end_src
-**** Sending Mail
+***** Sending Mail
 Let's send emails too.
 #+begin_src emacs-lisp
 (setq sendmail-program "/usr/bin/msmtp"
@@ -1925,7 +1934,7 @@ We can also use this a signature,
 (setq message-signature mu4e-from-name)
 #+end_src
 
-**** some visual improvements
+***** some visual improvements
 
 just makes the icons slightly better for unicode fonts
 #+begin_src emacs-lisp
