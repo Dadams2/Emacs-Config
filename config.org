@@ -64,6 +64,7 @@ Following in Tec's footsteps I somehow stumbled upon [[https://github.com/angryb
  window-combination-resize t ; take all new space
  x-stretch-cursor t          ; deal with glyphs
  enable-local-variables t    ; I want to be able to use dir-locals
+ global-auto-revert-mode t   ; reload files on disk
  )
 
 
@@ -504,6 +505,7 @@ t)))
 
 (setq doom-modeline-minor-modes nil)
 (setq doom-modeline-enable-word-count t) ; super nice in visual mode
+(setq doom-modeline-persp-name t) ; I want to know where I am
  #+end_src
 
 
@@ -909,8 +911,11 @@ the thing that is most likely going to slow down my typing experience.
 
 #+begin_src emacs-lisp
 (after! company
-  (setq company-minimum-prefix-length 2)
-  (setq company-show-numbers t))
+  (setq company-idle-delay 0.5
+        company-minimum-prefix-length 3
+        company-show-numbers t)
+  (add-hook
+   'evil-normal-state-entry-hook #'company-abort))
 #+end_src
 
 Also a good idea to improve memory:
@@ -951,6 +956,14 @@ Nothing to put here currently. Look into ~company-dabbrev-code~
 because it faster
 #+begin_src emacs-lisp
 (setq projectile-indexing-method 'native)
+;; (after! projectile
+;;   (dolist (project myprojects)
+;;     (projectile-add-known-project project)))
+
+
+;; (setq projectile-project-search-path '("~/Things/"))
+
+
 #+end_src
 *** Smerge
 The default keybindings are not the best really, and could use some improvement.
