@@ -132,43 +132,40 @@ and that's it. There are also extra features that can be added to some of the mo
 ;;      directory (for easy access to its source code).
 
 (doom! :input
-;;chinese
-;;japanese
-;;layout            ; auie,ctsrnm is the superior home row
+       <<doom-input>>
 
-:completion
-    <<doom-completion>>
+        :completion
+        <<doom-completion>>
 
-:ui
-    <<doom-ui>>
+        :ui
+        <<doom-ui>>
 
-:editor
-    <<doom-editor>>
+        :editor
+        <<doom-editor>>
 
-:term
-    <<doom-term>>
+        :term
+        <<doom-term>>
 
-:checkers
-    <<doom-checkers>>
+        :checkers
+        <<doom-checkers>>
 
-:tools
-    <<doom-tools>>
+        :tools
+        <<doom-tools>>
 
-:os
-    <<doom-os>>
+        :os
+        <<doom-os>>
 
-:lang
-    <<doom-lang>>
+        :lang
+        <<doom-lang>>
 
-:email
-    <<doom-email>>
+        :email
+        <<doom-email>>
 
-:app
-    <<doom-app>>
+        :app
+        <<doom-app>>
 
-:config
-    <<doom-config>>
-
+        :config
+        <<doom-config>>
 ) ;lol don't forget this closing brace like I did
 #+end_src
 
@@ -303,6 +300,7 @@ rgb               ; creating color strings
 taskrunner        ; taskrunner for all your projects
 ;;terraform         ; infrastructure as code
 tmux              ; an API for interacting with tmux
+tree-sitter       ; syntax and parsing, sitting in a tree...
 upload            ; map local to remote projects via ssh/ftp
 #+end_src
 #+name: doom-os
@@ -336,6 +334,7 @@ emacs-lisp        ; drown in parentheses
 ;;fsharp            ; ML stands for Microsoft's Language
 ;;fstar             ; (dependent) types and (monadic) effects and Z3
 ;;gdscript          ; the language you waited for
+;;(graphql +lsp) ; Give queries a REST
 ;;(go +lsp)         ; the hipster dialect
 ;;(haskell +dante)  ; a language that's lazier than I am
 ;;hy                ; readability of scheme w/ speed of python
@@ -404,6 +403,16 @@ everywhere        ; *leave* Emacs!? You must be joking
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
 
+**** Input
+
+Whilst I could probably do japanese it would be a struggle so lets not
+#+name: doom-input
+#+begin_src emacs-lisp
+;;bidi                       ; (tfel ot) thgir etirw uoy gnipleh
+;;chinese
+;;japanese
+;;layout                     ; auie,ctsrnm is the superior home row
+#+end_src
 
 *** General Visual
 
