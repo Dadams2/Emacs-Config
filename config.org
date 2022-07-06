@@ -244,7 +244,7 @@ snippets          ; my elves. They type so I don't have to
 ;;word-wrap         ; soft wrapping with language-aware indent
 
 :emacs
-(dired +icons)            ; making dired pretty [functional]
+(dired +icons +ranger)            ; making dired pretty [functional]
 electric          ; smarter, keyword-based electric-indent
 (ibuffer +icons)       ; interactive buffer management
 undo              ; persistent, smarter undo for your inevitable mistakes
@@ -283,7 +283,7 @@ despite the name herein lies some of the things that make emacs worth using.
 #+name: doom-tools
 #+begin_src emacs-lisp
 ;;ansible
-;;debugger          ; FIXME stepping through code, to help you add bugs
+(debugger +lsp)          ; FIXME stepping through code, to help you add bugs
 ;;direnv
 docker
 editorconfig      ; let someone else argue about tabs vs spaces
