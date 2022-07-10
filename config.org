@@ -105,6 +105,12 @@ and when I do I would like to be promoted for what buffer to switch to
   (consult-buffer))
 #+end_src
 
+*** Window switching
+doom uses ace window for quick navigation between multiple windows.
+By default numbers are used. I would rather use the home row
+#+begin_src emacs-lisp :tangle yes
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+#+end_src
 **  Doom Config
 
 *** Modules
@@ -1921,7 +1927,6 @@ just makes the icons slightly better for unicode fonts
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
-
 ;; (setq lsp-idle-delay 0.500)
 ;; (setq shell-file-name "bash")
 ;; (setq shell-command-switch "-ic")
