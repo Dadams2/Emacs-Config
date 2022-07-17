@@ -39,6 +39,11 @@ apparently this makes things run faster (I found it [[https://nullprogram.com/bl
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 #+end_src
 
+
+#+begin_src shell :exports none :comments no :tangle-mode (identity #o755)
+#!/usr/bin/env bash
+#+end_src
+
 ** Personal info
 
 From ~GPG~ to ~git~ to email clients and snippets, the following seems kinda important to have around
@@ -108,7 +113,7 @@ and when I do I would like to be promoted for what buffer to switch to
 *** Window switching
 doom uses ace window for quick navigation between multiple windows.
 By default numbers are used. I would rather use the home row
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp
 (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
 #+end_src
 **  Doom Config
@@ -729,6 +734,34 @@ There are only a few things I do on the dashboard. So why not make them quicker 
 (add-hook! 'doom-init-ui-hook :append (+doom-dashboard-setup-modified-keymap))
 #+end_src
 
+*** Setup Script
+
+Doom doesn't always install everything I need so there are a few things to bring in
+#+name: run-setup
+#+begin_src emacs-lisp :tangle no
+(if (file-exists-p "setup.sh")
+    (if (string-empty-p (string-trim (with-temp-buffer (insert-file-contents "setup.sh") (buffer-string)) "#!/usr/bin/env bash"))
+        (message ";; Setup script is empty")
+      (message ";; Detected content in the setup script")
+      (pp-to-string
+       `(unless noninteractive
+          (defun +config-run-setup ()
+            (when (yes-or-no-p (format "%s The setup script has content. Check and run the script?"
+                                       (propertize "Warning!" 'face '(bold warning))))
+              (find-file (expand-file-name "setup.sh" doom-private-dir))
+              (when (yes-or-no-p "Would you like to run this script?")
+                (async-shell-command "./setup.sh"))))
+          (add-hook! 'doom-init-ui-hook
+            (run-at-time nil nil #'+config-run-setup)))))
+  (message ";; setup.sh did not exist during tangle. Tangle again.")
+  (pp-to-string
+   `(unless noninteractive
+      (add-hook! 'doom-init-ui-hook #'+literate-tangle-async-h))))
+#+end_src
+
+#+begin_src emacs-lisp :noweb no-export
+<<run-setup()>>
+#+end_src
 * Packages
 ** Loading instructions
 :PROPERTIES:
@@ -1040,7 +1073,7 @@ SCOWL provides a nice place to get dictionaries from I would like one:
 
 **** Aspell
 
-#+begin_src shell :tangle no
+#+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
 cd /tmp
 curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
 tar -xjf "aspell6-en-custom.tar.bz2"
@@ -1169,6 +1202,12 @@ Sometimes the emoji is used over the actual character when we really want the ac
 
 ** Mail
 *** Fetching
+install giomap notify
+#+begin_src shell :eval no :tangle (if (and (executable-find "mu") (not (executable-find "goimapnotify"))) "setup.sh" "no")
+go get -u gitlab.com/shackra/goimapnotify
+ln -s ~/.local/share/go/bin/goimapnotify ~/.local/bin/
+#+end_src
+
 **** Rebuild mail index whilst using mu4e
 #+begin_src emacs-lisp (if not((executable-find "mu")) ":tangle no")
 (after! mu4e
@@ -1598,6 +1637,11 @@ if __name__ == "__main__":
     main()
 #+end_src
 
+
+As long as the =mbsyncrc= file exists, this is as easy as running
+#+begin_src shell :tangle (if (and (executable-find "mu") (not (file-exists-p "~/.config/imapnotify"))) "setup.sh" "no")
+~/.config/doom/misc/mbsync-imapnotify.py
+#+end_src
 ***** mbsync to msmtp
 
 #+begin_src python :tangle misc/mbsync-msmtp.py :shebang "#!/usr/bin/env python3"
@@ -1762,6 +1806,11 @@ WantedBy=suspend.target
 #+end_src
 
 *** Indexing
+
+Enabling (and starting) this is as simple as
+#+begin_src shell :tangle (if (or (not (executable-find "mu")) (string= "enabled\n" (shell-command-to-string "systemctl --user is-enabled mbsync.timer"))) "no" "setup.sh")
+systemctl --user enable mbsync.timer --now
+#+end_src
 *** Sending
 *** Mu4e
 
@@ -1926,12 +1975,90 @@ just makes the icons slightly better for unicode fonts
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/Org/")
+(setq org-agenda-files '("~/Org/experiments.org"
+                         "~/Org/birthday.org"))
+(setq org-deadline-past-days 14)
+(setq org-agenda-start-with-log-mode t)
+(setq org-log-done t)
+(setq org-log-into-drawer t)
+;; ((sequence "TODO(t)" "PROJ(p)" "LOOP(r)" "STRT(s)" "WAIT(w)" "HOLD(h)" "IDEA(i)" "|" "DONE(d)" "KILL(k)")
+(setq org-todo-keywords
+'((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+ (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")
+ (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
+ (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
+
+  (setq org-refile-targets
+    '(("Archive.org" :maxlevel . 1)
+      ("Tasks.org" :maxlevel . 1)))
+
+  ;; Save Org buffers after refiling!
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
 ;; (setq lsp-idle-delay 0.500)
 ;; (setq shell-file-name "bash")
 ;; (setq shell-command-switch "-ic")
+  ;; Configure custom agenda views
+  (setq org-agenda-custom-commands
+   '(("d" "Dashboard"
+     ((agenda "" ((org-deadline-warning-days 7)))
+      (todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))
+      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
+    ("n" "Next Tasks"
+     ((todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))))
 
+    ("W" "Work Tasks" tags-todo "+work-email")
+
+    ;; Low-effort next actions
+    ("e" tags-todo "+TODO=\"TODO\"+Effort<15&+Effort>0"
+     ((org-agenda-overriding-header "Low Effort Tasks")
+      (org-agenda-max-todos 20)
+      (org-agenda-files org-agenda-files)))
+
+    ("w" "Workflow Status"
+     ((todo "WAIT"
+            ((org-agenda-overriding-header "Waiting on External")
+             (org-agenda-files org-agenda-files)))
+      (todo "REVIEW"
+            ((org-agenda-overriding-header "In Review")
+             (org-agenda-files org-agenda-files)))
+      (todo "PLAN"
+            ((org-agenda-overriding-header "In Planning")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "BACKLOG"
+            ((org-agenda-overriding-header "Project Backlog")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "READY"
+            ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
+      (todo "ACTIVE"
+            ((org-agenda-overriding-header "Active Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "COMPLETED"
+            ((org-agenda-overriding-header "Completed Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "CANC"
+            ((org-agenda-overriding-header "Cancelled Projects")
+             (org-agenda-files org-agenda-files)))))))
+
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)))
 #+end_src
 
 
