@@ -113,8 +113,13 @@ and when I do I would like to be promoted for what buffer to switch to
 *** Window switching
 doom uses ace window for quick navigation between multiple windows.
 By default numbers are used. I would rather use the home row
+Simply dont' add =+numbers=
 #+begin_src emacs-lisp
-(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+;; (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+;; (custom-set-faces!
+;;   '(aw-leading-char-face
+;;     :foreground "white" :background "red"
+;;     :weight bold :height 2.5 :box (:line-width 5 :color "red")))
 #+end_src
 **  Doom Config
 
@@ -226,12 +231,12 @@ nav-flash         ; blink cursor line after big motions
 ;;neotree           ; a project drawer, like NERDTree for vim
 ophints           ; highlight the region an operation acts on
 (popup +defaults +all)   ; tame sudden yet inevitable temporary windows
-(tabs +centaur-tabs)             ; a tab bar for Emacs and prettyer tabs
+(tabs)             ; a tab bar for Emacs and prettyer tabs
 treemacs          ; a project drawer, like neotree but cooler
 unicode           ; extended unicode support for various languages
 vc-gutter         ; vcs diff in the fringe
 vi-tilde-fringe   ; fringe tildes to mark beyond EOB
-(window-select +numbers)    ; visually switch windows
+window-select    ; visually switch windows
 workspaces        ; tab emulation, persistence & separate workspaces
 zen               ; distraction-free coding or writing
 
@@ -383,7 +388,7 @@ markdown          ; writing docs for people to ignore
 ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
 ;;scala             ; java, but good
 ;;(scheme +guile)   ; a fully conniving family of lisps
-sh                ; she sells {ba,z,fi}sh shells on the C xor
+(sh +lsp)                ; she sells {ba,z,fi}sh shells on the C xor
 ;;sml
 ;;solidity          ; do you need a blockchain? No.
 ;;swift             ; who asked for emoji variables?
