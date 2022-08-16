@@ -1115,6 +1115,33 @@ nested snippets are good so:
 (setq yas-triggers-in-field t)
 #+end_src
 
+*** Dirvish
+A very nice extension to dired that seems significantly less buggy than =ranger.el=. However there are a few things we need to to keep things in check
+#+begin_src emacs-lisp
+;; (setq dirvish-mode-line-format ; it's ok to place string inside
+;;    '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
+;; (set-popup-rule! "^ \\*Dirvish.*" :ignore t)
+
+;;   (map! :map dirvish-mode-map
+;;         :n "b" #'dirvish-goto-bookmark
+;;         :n "z" #'dirvish-show-history
+;;         :n "f" #'dirvish-file-info-menu
+;;         :n "F" #'dirvish-toggle-fullscreen
+;;         :n "l" #'dired-find-file
+;;         :n "h" #'dired-up-directory
+;;         :n "?" #'dirvish-dispatch
+;;         :n "q" #'quit-window
+;;         :localleader
+;;         "h" #'dired-omit-mode)
+
+
+;; (after! dirvish
+;;   (push '(collapse subtree-state) dirvish-attributes)
+;;   (setq dired-listing-switches
+;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
+
+#+end_src
+
 ** Visuals
 
 *** Info Colors
