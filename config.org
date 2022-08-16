@@ -1198,6 +1198,25 @@ Sometimes the emoji is used over the actual character when we really want the ac
     (remhash emoji emojify-emojis)))
 #+end_src
 
+
+*** Magit Delta
+magit's diff highlighting is already so much better than most git programs. However
+=delta= is another step up. Here be some rudimentary configuration
+TODO: add system installation for delta
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! magit-delta)
+#+end_src
+its currently not enabled as a module flag in doom so we need to do it ourself
+#+begin_src emacs-lisp
+(after! magit
+  (magit-delta-mode +1))
+(setq
+    magit-delta-default-dark-theme "Nord"
+    magit-delta-default-light-theme "OneHalfLight")
+#+end_src
+
+
 ** File Types
 
 *** Systemd
@@ -2085,7 +2104,6 @@ just makes the icons slightly better for unicode fonts
 (package! impatient-mode)
 (package! ox-gfm)
 (package! ztree)
-(package! magit-delta)
 ;; (unpin! mu4e)
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
