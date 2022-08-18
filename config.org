@@ -2016,6 +2016,14 @@ just makes the icons slightly better for unicode fonts
                                  "Search is full!")))
 #+end_src
 
+*** Notifications
+the main version of mu4e alert is kinda broken which is a shame. Need to keep an
+eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Untill then at least this fork is *slightly* less broken
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! mu4e-alert
+ :recipe (:host github :repo "xzz53/mu4e-alert"))
+#+end_src
+
 * Languages
 
 ** Python
