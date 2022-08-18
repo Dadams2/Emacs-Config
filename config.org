@@ -118,10 +118,17 @@ and when I do I would like to be promoted for what buffer to switch to
   (consult-buffer))
 #+end_src
 
+being able to rotate window layouts is nice
+#+begin_src elisp
+(map! :map evil-window-map
+      "SPC" #'rotate-layout)
+#+end_src
+
+
 *** Window switching
 doom uses ace window for quick navigation between multiple windows.
 By default numbers are used. I would rather use the home row
-Simply dont' add =+numbers=
+Simply don't' add src_elisp{+numbers} to src_elisp{ui: window-select}
 #+begin_src emacs-lisp
 ;; (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
 ;; (custom-set-faces!
@@ -129,6 +136,8 @@ Simply dont' add =+numbers=
 ;;     :foreground "white" :background "red"
 ;;     :weight bold :height 2.5 :box (:line-width 5 :color "red")))
 #+end_src
+TODO: consider a better face for it
+
 **  Doom Config
 
 *** Modules
@@ -519,9 +528,7 @@ I like the softer look of Nord and use it in a number of other places. There are
 but overall its nice.
 
 #+begin_src emacs-lisp
-
 (setq doom-theme 'doom-nord)
-
 #+end_src
 
 I use linux on all my systems so I don't need to be told that =LF UTF-8= is my file encoding all the time
@@ -535,7 +542,10 @@ I use linux on all my systems so I don't need to be told that =LF UTF-8= is my f
 t)))
 
 (add-hook 'after-change-major-mode-hook #'doom-modeline-conditional-buffer-encoding)
+ #+end_src
 
+there are also a few other nice things I like
+ #+begin_src elisp
 (setq doom-modeline-minor-modes nil)
 (setq doom-modeline-enable-word-count t) ; super nice in visual mode
 (setq doom-modeline-persp-name t) ; I want to know where I am
@@ -544,6 +554,26 @@ t)))
 
 
 ** Other stuff
+*** Allow babel execution in CLI actions
+In this config I sometimes generate code to include in my config.
+This works nicely, but for it to work with =doom sync= et. al. I need to make sure
+that Org doesn't try to confirm that I want to allow evaluation (I do!).
+
+Thankfully Doom supports =$DOOMDIR/cli.el= file which is sourced every time a CLI
+command is run, so we can just enable evaluation by setting
+~org-confirm-babel-evaluate~ to ~nil~ there.
+While we're at it, we should silence ~org-babel-execute-src-block~ to
+avoid polluting the output.
+
+#+begin_src emacs-lisp :tangle cli.el :comments no
+;;; cli.el -*- lexical-binding: t; -*-
+(setq org-confirm-babel-evaluate nil)
+
+(defun doom-shut-up-a (orig-fn &rest args)
+  (quiet! (apply orig-fn args)))
+
+(advice-add 'org-babel-execute-src-block :around #'doom-shut-up-a)
+#+end_src
 
 *** Line numbers
 
@@ -694,16 +724,14 @@ Also make sure to switch to the dashboard.
 
 #+name: daemon initialisation
 #+begin_src emacs-lisp (if not((executable-find "mu")) ":tangle no")
-
 (defun greedily-do-daemon-setup ()
   (require 'org)
   (when (require 'mu4e nil t)
     (setq mu4e-confirm-quit t)
     (setq +mu4e-lock-greedy t)
     (setq +mu4e-lock-relaxed t)
-    (+mu4e-lock-add-watcher)
     (when (+mu4e-lock-available t)
-      (mu4e~start)))
+      (mu4e--start)))
   (when (require 'elfeed nil t)
     (run-at-time nil (* 8 60 60) #'elfeed-update)))
 
@@ -754,6 +782,11 @@ There are only a few things I do on the dashboard. So why not make them quicker 
 (add-transient-hook! #'+doom-dashboard-mode (+doom-dashboard-setup-modified-keymap))
 (add-transient-hook! #'+doom-dashboard-mode :append (+doom-dashboard-setup-modified-keymap))
 (add-hook! 'doom-init-ui-hook :append (+doom-dashboard-setup-modified-keymap))
+#+end_src
+
+leader for =d= is currently unbound so why not?
+#+begin_src emacs-lisp
+(map! :leader :desc "Dashboard" "d" #'+doom-dashboard/open)
 #+end_src
 
 *** Setup Script
@@ -870,6 +903,14 @@ till I figure out what I want
 (setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
 #+end_src
 
+*** Rotate (window management)
+
+The =rotate= package just adds the ability to rotate window layouts, but that
+sounds nice to me.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! rotate :pin "4e9ac3ff800880bd9b705794ef0f7c99d72900a6")
+#+end_src
 
 *** Which-key
 
