@@ -276,7 +276,7 @@ snippets               ; my elves. They type so I don't have to
 ;;word-wrap            ; soft wrapping with language-aware indent
 
 :emacs
-(dired +icons +ranger) ; making dired pretty [functional]
+(dired +icons)         ; making dired pretty [functional]
 electric               ; smarter, keyword-based electric-indent
 (ibuffer +icons)       ; interactive buffer management
 undo                   ; persistent, smarter undo for your inevitable mistakes
@@ -379,7 +379,9 @@ emacs-lisp          ; drown in parentheses
 (json
  +lsp
  +tree-sitter)      ; At least it ain't XML
-(java +lsp)         ; the poster child for carpal tunnel syndrome
+(java
+ +lsp
+ +tree-sitter)      ; the poster child for carpal tunnel syndrome
 (javascript +lsp)   ; all(hope(abandon(ye(who(enter(here))))))
 (julia +lsp)        ; a better, faster MATLAB
 ;;kotlin            ; a better, slicker Java(Script)
