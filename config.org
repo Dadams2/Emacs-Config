@@ -17,6 +17,8 @@
 - [[#applications][Applications]]
   - [[#mail][Mail]]
 - [[#languages][Languages]]
+  - [[#org][Org]]
+  - [[#basic-configuration][Basic configuration]]
   - [[#python][Python]]
 -   [[#the-rest][The rest]]
 
@@ -2079,21 +2081,11 @@ eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Unti
 
 * Languages
 
-** Python
+** Org
 
+The beginning of a great journey
+** Basic configuration
 #+begin_src emacs-lisp
-(after! conda
-  (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/")
-        conda-env-home-directory (expand-file-name "~/.conda"))
-  )
-#+end_src
-
-*   The rest
-
-#+begin_src emacs-lisp
-
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Org/")
 (setq org-agenda-files '("~/Org/experiments.org"
                          "~/Org/birthday.org"))
@@ -2114,10 +2106,9 @@ eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Unti
 
   ;; Save Org buffers after refiling!
   (advice-add 'org-refile :after 'org-save-all-org-buffers)
-;; (setq lsp-idle-delay 0.500)
-;; (setq shell-file-name "bash")
-;; (setq shell-command-switch "-ic")
-  ;; Configure custom agenda views
+#+end_src
+
+#+begin_src emacs-lisp
   (setq org-agenda-custom-commands
    '(("d" "Dashboard"
      ((agenda "" ((org-deadline-warning-days 7)))
@@ -2178,6 +2169,66 @@ eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Unti
        ("batch" . ?b)
        ("note" . ?n)
        ("idea" . ?i)))
+#+end_src
+*** Roam
+just set where I want things to be
+#+begin_src emacs-lisp
+(setq org-roam-directory "~/Roam")
+#+end_src
+
+#+begin_src emacs-lisp
+
+(setq org-roam-capture-templates
+      '(("m" "main" plain
+         "%?"
+         :if-new (file+head "main/${slug}.org"
+                            "#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("r" "reference" plain "%?"
+         :if-new
+         (file+head "reference/${title}.org" "#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t)
+        ("a" "article" plain "%?"
+         :if-new
+         (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
+         :immediate-finish t
+         :unnarrowed t)))
+#+end_src
+
+** Python
+
+#+begin_src emacs-lisp
+(after! conda
+  (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/")
+        conda-env-home-directory (expand-file-name "~/.conda"))
+  )
+#+end_src
+
+*   The rest
+
+#+begin_src emacs-lisp
+
+
+(defun execute-macro-slow (&optional slot delay rand-delay)
+  (interactive)
+  (let ((macro (append (evil-get-register (or slot (read-char "@-")) t) nil))
+        (delay (or delay 0.01))
+        (rand-delay (or rand-delay 0.01)))
+    (if (listp macro)
+        (while macro
+          (if (eq (car macro) (aref (kbd "M-x") 0)) ; Needs M-x + cmd + RET
+              (let (mx-cmd)
+                (while (not (eq (car mx-cmd) 'return))
+                  (push (pop macro) mx-cmd))
+                (execute-kbd-macro (vconcat (nreverse mx-cmd))))
+            (execute-kbd-macro (vector (pop macro))))
+          (sleep-for (* rand-delay (cl-random 0.5)))
+          (sit-for delay))
+      (message "Slot is empty/invalid."))))
+
+
 #+end_src
 
 
