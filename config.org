@@ -2323,7 +2323,7 @@ a straight rip of the doom config
 (setq org-capture-templates
 '(("t" "Personal todo" entry
 (file+headline +org-capture-todo-file "Inbox")
-"* [ ] %?\n%i:LOGBOOK:\n- Added: %U\n:END:\n\n%a" :prepend t)
+"* TODO %?\n%i:LOGBOOK:\n- Added: %U\n:END:\n\n%a" :prepend t)
 ("n" "Personal notes" entry
 (file+headline +org-capture-notes-file "Inbox")
 "* %u %?\n%i\n%a" :prepend t)
