@@ -1408,8 +1408,7 @@ ln -s ~/.local/share/go/bin/goimapnotify ~/.local/bin/
 #+end_src
 
 **** Rebuild mail index whilst using mu4e
-#+begin_src emacs-lisp (if not((executable-find "mu")) ":tangle no")
-(after! mu4e
+#+begin_src emacs-lisp (if not((executable-find "mu")) ":tangle no") :noweb-ref mu4e-conf
   (defvar mu4e-reindex-request-file "/tmp/mu_reindex_now"
     "Location of the reindex request, signaled by existance")
   (defvar mu4e-reindex-request-min-seperation 5.0
@@ -1459,7 +1458,7 @@ Prevents a series of redisplays from being called (when set to an appropriate va
           (mu4e~proc-index nil t)
         (when new-request
           (run-at-time (* 1.1 mu4e-reindex-request-min-seperation) nil
-                       #'mu4e-reindex-maybe))))))
+                       #'mu4e-reindex-maybe)))))
 #+end_src
 
 **** Config Conversions
@@ -2012,20 +2011,18 @@ systemctl --user enable mbsync.timer --now
 #+end_src
 *** Sending
 *** Mu4e
-
 This is here because of some weird ass property drawer errors
-#+begin_src emacs-lisp :noweb no-export (if (executable-find "mu") ":tangle yes") :noweb-ref nil
+#+begin_src emacs-lisp :noweb no-export :noweb-prefix no (if (executable-find "mu") ":tangle yes")
 (after! mu4e
-  <<mu4e-conf>>
-)
+  <<mu4e-conf>>)
 #+end_src
 
-**** Config
+
+**** Viewing Mail
 :PROPERTIES:
 :header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
 :END:
 
-***** Viewing Mail
 Browser good for rendering not good for email applications.
 
 To account for the increase width of each flag character, and make perform a
@@ -2058,11 +2055,14 @@ few more visual tweaks, we'll tweak the headers a bit
                  (replace-regexp-in-string "\\`.*/" "" (mu4e-message-field msg :maildir))
                  '+mu4e-header--folder-colors))))))
 #+end_src
-We'll also use a nicer alert icon
+We'll also use a nicer alert icon or not
 #+begin_src emacs-lisp
 ;; (setq mu4e-alert-icon "/usr/share/icons/Papirus/64x64/apps/evolution.svg")
 #+end_src
-****** Contexts
+**** Contexts
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
+:END:
 
 These be important
 #+begin_src emacs-lisp
@@ -2070,7 +2070,11 @@ These be important
 (setq mu4e-compose-context-policy 'always-ask)
 (load! "private/email.el")
 #+end_src
-***** Sending Mail
+
+**** Sending Mail
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
+:END:
 Let's send emails too.
 #+begin_src emacs-lisp
 (setq sendmail-program "/usr/bin/msmtp"
@@ -2133,7 +2137,10 @@ We can also use this a signature,
 (setq message-signature mu4e-from-name)
 #+end_src
 
-***** some visual improvements
+**** some visual improvements
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
+:END:
 
 just makes the icons slightly better for unicode fonts
 #+begin_src emacs-lisp
