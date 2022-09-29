@@ -18,7 +18,6 @@
   - [[#mail][Mail]]
 - [[#languages][Languages]]
   - [[#org][Org]]
-  - [[#basic-configuration][Basic configuration]]
   - [[#python][Python]]
 -   [[#the-rest][The rest]]
 
@@ -712,6 +711,7 @@ Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
 Type=forking
 ExecStart=sh -c 'emacs --daemon && emacsclient -c --eval "(delete-frame)"'
 ExecStop=/usr/bin/emacsclient --no-wait --eval "(progn (setq kill-emacs-hook nil) (kill emacs))"
+Environment=COLORTERM=truecolor
 Restart=on-failure
 
 [Install]
@@ -791,6 +791,92 @@ There are only a few things I do on the dashboard. So why not make them quicker 
 leader for =d= is currently unbound so why not?
 #+begin_src emacs-lisp
 (map! :leader :desc "Dashboard" "d" #'+doom-dashboard/open)
+#+end_src
+*** Emacs Client Wrapper
+I do make use of emacs as a terminal emulator from time to time.
+
+By having this as a script instead of aliases we get a few advantages:
++ accepting stdin by putting in a temp file
++ guessing that =tty= is a good idea when ~$DISPLAY~ is unset
++ makes =emacsclient= instances non blocking
+
+#+name: e
+#+begin_src shell :tangle ~/.local/bin/e :mkdirp yes :tangle-mode (identity #o755) :comments no
+#!/usr/bin/env bash
+force_tty=false
+force_wait=false
+stdin_mode=""
+
+args=()
+
+while :; do
+    case "$1" in
+        -t | -nw | --tty)
+            force_tty=true
+            shift ;;
+        -w | --wait)
+            force_wait=true
+            shift ;;
+        -m | --mode)
+            stdin_mode=" ($2-mode)"
+            shift 2 ;;
+        -h | --help)
+            echo -e "\033[1mUsage: e [-t] [-m MODE] [OPTIONS] FILE [-]\033[0m
+
+Emacs client convenience wrapper.
+
+\033[1mOptions:\033[0m
+\033[0;34m-h, --help\033[0m            Show this message
+\033[0;34m-t, -nw, --tty\033[0m        Force terminal mode
+\033[0;34m-w, --wait\033[0m            Don't supply \033[0;34m--no-wait\033[0m to graphical emacsclient
+\033[0;34m-\033[0m                     Take \033[0;33mstdin\033[0m (when last argument)
+\033[0;34m-m MODE, --mode MODE\033[0m  Mode to open \033[0;33mstdin\033[0m with
+
+Run \033[0;32memacsclient --help\033[0m to see help for the emacsclient."
+            exit 0 ;;
+        --*=*)
+            set -- "$@" "${1%%=*}" "${1#*=}"
+            shift ;;
+        ,*)
+            if [ "$#" = 0 ]; then
+                break; fi
+            args+=("$1")
+            shift ;;
+    esac
+done
+
+if [ ! "${#args[*]}" = 0 ] && [ "${args[-1]}" = "-" ]; then
+    unset 'args[-1]'
+    TMP="$(mktemp /tmp/emacsstdin-XXX)"
+    cat > "$TMP"
+    args+=(--eval "(let ((b (generate-new-buffer \"*stdin*\"))) (switch-to-buffer b) (insert-file-contents \"$TMP\") (delete-file \"$TMP\")${stdin_mode})")
+fi
+
+if [ -z "$DISPLAY" ] || $force_tty; then
+    # detect terminals with sneaky 24-bit support
+    if { [ "$COLORTERM" = truecolor ] || [ "$COLORTERM" = 24bit ]; } \
+        && [ "$(tput colors 2>/dev/null)" -lt 257 ]; then
+        if echo "$TERM" | grep -q "^\w\+-[0-9]"; then
+            termstub="${TERM%%-*}"; else
+            termstub="${TERM#*-}"; fi
+        if infocmp "$termstub-direct" >/dev/null 2>&1; then
+            TERM="$termstub-direct"; else
+            TERM="xterm-direct"; fi # should be fairly safe
+    fi
+    emacsclient --tty -create-frame --alternate-editor="$ALTERNATE_EDITOR" "${args[@]}"
+else
+    if ! $force_wait; then
+        args+=(--no-wait); fi
+    emacsclient -create-frame --alternate-editor="$ALTERNATE_EDITOR" "${args[@]}"
+fi
+#+end_src
+
+Now, to set an alias to use =e= with magit, and then for maximum laziness we can
+set aliases for the terminal-forced variants.
+#+begin_src shell :tangle no
+alias m='e --eval "(progn (magit-status) (delete-other-windows))"'
+alias mt="m -t"
+alias et="e -t"
 #+end_src
 
 *** Setup Script
@@ -2081,24 +2167,28 @@ eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Unti
 
 * Languages
 
+
 ** Org
 
 The beginning of a great journey
-** Basic configuration
+
+#+begin_src elisp :noweb no-export :noweb-prefix no 
+(after! org
+  <<org-conf>>
+)
+#+end_src
+
+
+*** Basic configuration
 #+begin_src emacs-lisp
 (setq org-directory "~/Org/")
 (setq org-agenda-files '("~/Org/experiments.org"
+                         "~/Org/mylife.org"
                          "~/Org/birthday.org"))
 (setq org-deadline-past-days 14)
 (setq org-agenda-start-with-log-mode t)
 (setq org-log-done t)
 (setq org-log-into-drawer t)
-;; ((sequence "TODO(t)" "PROJ(p)" "LOOP(r)" "STRT(s)" "WAIT(w)" "HOLD(h)" "IDEA(i)" "|" "DONE(d)" "KILL(k)")
-(setq org-todo-keywords
-'((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
- (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")
- (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
- (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
 
   (setq org-refile-targets
     '(("Archive.org" :maxlevel . 1)
@@ -2107,7 +2197,12 @@ The beginning of a great journey
   ;; Save Org buffers after refiling!
   (advice-add 'org-refile :after 'org-save-all-org-buffers)
 #+end_src
+*** Config
+:PROPERTIES:
+:header-args:emacs-lisp: :noweb-ref org-conf
+:END:
 
+**** Custom agenda commands
 #+begin_src emacs-lisp
   (setq org-agenda-custom-commands
    '(("d" "Dashboard"
@@ -2156,6 +2251,45 @@ The beginning of a great journey
             ((org-agenda-overriding-header "Cancelled Projects")
              (org-agenda-files org-agenda-files)))))))
 
+#+end_src
+**** Todo Keywords
+
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        '((sequence
+           "TODO(t)"       ; A task that needs doing & is ready to do
+           "PROJ(p)"       ; A project, which usually contains other tasks
+           "LOOP(r)"       ; A recurring task
+           "STRT(s)"       ; A task that is in progress
+           "WAIT(w)"       ; Something external is holding up this task
+           "HOLD(h)"       ; This task is paused/on hold because of me
+           "IDEA(i)"       ; An unconfirmed and unapproved task or notion
+           "NEXT(l)"       ; Something to consider doing
+           "|"
+           "DONE(d)"       ; Task successfully completed
+           "CANCELLED(k)") ; Task was cancelled, aborted or is no longer applicable
+          (sequence
+           "[ ](T)"        ; A task that needs doing
+           "[-](S)"        ; Task is in progress
+           "[?](W)"        ; Task is being held up or paused
+           "|"
+           "[X](D)")       ; Task was completed
+          (sequence
+           "|"
+           "OKAY(o)"
+           "YES(y)"
+           "NO(n)"))
+        org-todo-keyword-faces
+        '(("[-]"  . +org-todo-active)
+          ("STRT" . +org-todo-active)
+          ("[?]"  . +org-todo-onhold)
+          ("WAIT" . +org-todo-onhold)
+          ("HOLD" . +org-todo-onhold)
+          ("PROJ" . +org-todo-project)
+          ("NO"   . +org-todo-cancel)
+          ("CANCELLED" . +org-todo-cancel)))
+
+
   (setq org-tag-alist
     '((:startgroup)
        ; Put mutually exclusive tags here
@@ -2163,6 +2297,7 @@ The beginning of a great journey
        ("@errand" . ?E)
        ("@home" . ?H)
        ("@work" . ?W)
+       ("computer" . ?c)
        ("agenda" . ?a)
        ("planning" . ?p)
        ("publish" . ?P)
