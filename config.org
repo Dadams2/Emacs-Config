@@ -2195,15 +2195,20 @@ The beginning of a great journey
 (setq org-deadline-past-days 14)
 (setq org-agenda-start-with-log-mode t)
 (setq org-log-done t)
+(setq org-log-reschedule t)
 (setq org-log-into-drawer t)
+(setq org-refile-allow-creating-parent-nodes t)
+;; (setq org-archive-location "~/Org/Archive.org::datetree/* Finished Tasks")
 
   (setq org-refile-targets
     '(("Archive.org" :maxlevel . 1)
-      ("Tasks.org" :maxlevel . 1)))
+      ("mylife.org" :maxlevel . 1)
+      ("~/Org/work/todo.org" :maxlevel . 1)))
 
   ;; Save Org buffers after refiling!
   (advice-add 'org-refile :after 'org-save-all-org-buffers)
 #+end_src
+
 *** Config
 :PROPERTIES:
 :header-args:emacs-lisp: :noweb-ref org-conf
@@ -2264,28 +2269,28 @@ The beginning of a great journey
 #+begin_src emacs-lisp
   (setq org-todo-keywords
         '((sequence
-           "TODO(t)"       ; A task that needs doing & is ready to do
+           "TODO(t@/!)"       ; A task that needs doing & is ready to do
            "PROJ(p)"       ; A project, which usually contains other tasks
            "LOOP(r)"       ; A recurring task
            "STRT(s)"       ; A task that is in progress
-           "WAIT(w)"       ; Something external is holding up this task
+           "WAIT(w@/!)"       ; Something external is holding up this task
            "HOLD(h)"       ; This task is paused/on hold because of me
            "IDEA(i)"       ; An unconfirmed and unapproved task or notion
-           "NEXT(l)"       ; Something to consider doing
+           "NEXT(n@/!)"       ; Something to consider doing
            "|"
-           "DONE(d)"       ; Task successfully completed
+           "DONE(d@)"       ; Task successfully completed
            "CANCELLED(k)") ; Task was cancelled, aborted or is no longer applicable
           (sequence
            "[ ](T)"        ; A task that needs doing
            "[-](S)"        ; Task is in progress
            "[?](W)"        ; Task is being held up or paused
            "|"
-           "[X](D)")       ; Task was completed
-          (sequence
-           "|"
-           "OKAY(o)"
-           "YES(y)"
-           "NO(n)"))
+           "[X](D)"))      ; Task was completed
+          ;; (sequence
+          ;;  "|"
+          ;;  "OKAY(o)"
+          ;;  "YES(y)"
+          ;;  "NO(n)"))
         org-todo-keyword-faces
         '(("[-]"  . +org-todo-active)
           ("STRT" . +org-todo-active)
@@ -2293,7 +2298,7 @@ The beginning of a great journey
           ("WAIT" . +org-todo-onhold)
           ("HOLD" . +org-todo-onhold)
           ("PROJ" . +org-todo-project)
-          ("NO"   . +org-todo-cancel)
+          ;; ("NO"   . +org-todo-cancel)
           ("CANCELLED" . +org-todo-cancel)))
 
 
@@ -2311,6 +2316,56 @@ The beginning of a great journey
        ("batch" . ?b)
        ("note" . ?n)
        ("idea" . ?i)))
+#+end_src
+**** Capture Templates
+a straight rip of the doom config
+#+begin_src emacs-lisp
+(setq org-capture-templates
+'(("t" "Personal todo" entry
+(file+headline +org-capture-todo-file "Inbox")
+"* [ ] %?\n%i:LOGBOOK:\n- Added: %U\n:END:\n\n%a" :prepend t)
+("n" "Personal notes" entry
+(file+headline +org-capture-notes-file "Inbox")
+"* %u %?\n%i\n%a" :prepend t)
+("j" "Journal" entry
+(file+olp+datetree +org-capture-journal-file)
+"* %U %?\n%i\n%a" :prepend t)
+
+;; Will use {project-root}/{todo,notes,changelog}.org, unless a
+;; {todo,notes,changelog}.org file is found in a parent directory.
+;; Uses the basename from `+org-capture-todo-file',
+;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
+("p" "Templates for projects")
+("pt" "Project-local todo" entry  ; {project-root}/todo.org
+(file+headline +org-capture-project-todo-file "Inbox")
+"* TODO %?\n%i\n%a" :prepend t)
+("pn" "Project-local notes" entry  ; {project-root}/notes.org
+(file+headline +org-capture-project-notes-file "Inbox")
+"* %U %?\n%i\n%a" :prepend t)
+("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
+(file+headline +org-capture-project-changelog-file "Unreleased")
+"* %U %?\n%i\n%a" :prepend t)
+
+;; Will use {org-directory}/{+org-capture-projects-file} and store
+;; these under {ProjectName}/{Tasks,Notes,Changelog} headings. They
+;; support `:parents' to specify what headings to put them under, e.g.
+;; :parents ("Projects")
+("o" "Centralized templates for projects")
+("ot" "Project todo" entry
+(function +org-capture-central-project-todo-file)
+"* TODO %?\n %i\n %a"
+:heading "Tasks"
+:prepend nil)
+("on" "Project notes" entry
+(function +org-capture-central-project-notes-file)
+"* %U %?\n %i\n %a"
+:heading "Notes"
+:prepend t)
+("oc" "Project changelog" entry
+(function +org-capture-central-project-changelog-file)
+"* %U %?\n %i\n %a"
+:heading "Changelog"
+:prepend t)))
 #+end_src
 *** Roam
 just set where I want things to be
