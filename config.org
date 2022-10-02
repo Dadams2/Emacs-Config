@@ -166,8 +166,8 @@ and that's it. There are also extra features that can be added to some of the mo
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
-(doom! :input
-       <<doom-input>>
+(doom!  :input
+        <<doom-input>>
 
         :completion
         <<doom-completion>>
@@ -450,11 +450,12 @@ everywhere          ; *leave* Emacs!? You must be joking
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
 
+
 **** Input
 
 Whilst I could probably do japanese it would be a struggle so lets not
-#+name: doom-input
-#+begin_src emacs-lisp
+TODO: due to a bug in async tangle we don't include this
+#+begin_src emacs-lisp :tangle no
 ;;bidi                       ; (tfel ot) thgir etirw uoy gnipleh
 ;;chinese
 ;;japanese
@@ -704,7 +705,7 @@ for a lot of things it makes sense to run emacs as a daemon. Especially mail.
 #+name: emacsclient service
 #+begin_src systemd :tangle ~/.config/systemd/user/emacs.service :mkdirp yes
 [Unit]
-Description=Emacs server daemon
+Description=Emacs text editor
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
 
 [Service]
@@ -2019,7 +2020,7 @@ This is here because of some weird ass property drawer errors
 
 **** Viewing Mail
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb-ref mu4e-conf
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
 :END:
 
 Browser good for rendering not good for email applications.
@@ -2060,7 +2061,7 @@ We'll also use a nicer alert icon or not
 #+end_src
 **** Contexts
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb-ref mu4e-conf
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
 :END:
 
 These be important
@@ -2072,7 +2073,7 @@ These be important
 
 **** Sending Mail
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb-ref mu4e-conf
+:header-args:emacs-lisp: tangle: no :noweb-ref mu4e-conf
 :END:
 Let's send emails too.
 #+begin_src emacs-lisp
@@ -2138,7 +2139,7 @@ We can also use this a signature,
 
 **** some visual improvements
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb-ref mu4e-conf
+:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
 :END:
 
 just makes the icons slightly better for unicode fonts
@@ -2211,7 +2212,7 @@ The beginning of a great journey
 
 *** Config
 :PROPERTIES:
-:header-args:emacs-lisp: :noweb-ref org-conf
+:header-args:emacs-lisp: :tangle no :noweb-ref org-conf
 :END:
 
 **** Custom agenda commands
