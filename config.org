@@ -19,6 +19,7 @@
 - [[#languages][Languages]]
   - [[#org][Org]]
   - [[#python][Python]]
+  - [[#graphviz][Graphviz]]
 -   [[#the-rest][The rest]]
 
 * Preamble
@@ -114,9 +115,9 @@ and when I do I would like to be promoted for what buffer to switch to
 
 
 #+begin_src emacs-lisp
-(defadvice! prompt-for-buffer (&rest _)
-  :after '(evil-window-split evil-window-vsplit)
-  (consult-buffer))
+;; (defadvice! prompt-for-buffer (&rest _)
+;;   :after '(evil-window-split evil-window-vsplit)
+;;   (consult-buffer))
 #+end_src
 
 being able to rotate window layouts is nice
@@ -138,6 +139,22 @@ Simply don't' add src_elisp{+numbers} to src_elisp{ui: window-select}
 ;;     :weight bold :height 2.5 :box (:line-width 5 :color "red")))
 #+end_src
 TODO: consider a better face for it
+*** Embark for window switching
+#+begin_src emacs-lisp
+(eval-when-compile
+  (defmacro my/embark-ace-action (fn)
+    `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+       (interactive)
+       (with-demoted-errors "%s"
+         (require 'ace-window)
+         (let ((aw-dispatch-always t))
+           (aw-switch-to-window (aw-select nil))
+           (call-interactively (symbol-function ',fn)))))))
+
+(define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
+(define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
+(define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+#+end_src
 
 **  Doom Config
 
@@ -305,7 +322,7 @@ grammar would be much better if it offered suggestions on how to improve things 
 #+begin_src emacs-lisp
 syntax              ; tasing you for every semicolon you forget
 (:if (executable-find "aspell") (spell +flyspell +aspell +everywhere)) ; tasing you for misspelling mispelling
-;;grammar           ; tasing grammar mistake every you make
+grammar           ; tasing grammar mistake every you make
 #+end_src
 
 
@@ -399,6 +416,8 @@ latex               ; writing papers in Emacs has never been so fun
  +pandoc
  +present
  +roam2
+ +gnuplot
+ +dragndrop
  +jupyter)          ; organize your plain life in plain text
 ;;php               ; perl's insecure younger brother
 ;;plantuml          ; diagrams for confusing people more
@@ -445,7 +464,7 @@ there are other things to consider as well
 ;;calendar          ; A dated approach to timetabling
 ;;emms              ; Multimedia in Emacs is music to my ears
 everywhere          ; *leave* Emacs!? You must be joking
-;;irc               ; how neckbeards socialize
+irc                 ; how neckbeards socialize
 ;;(rss +org)        ; emacs as an RSS reader
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
@@ -754,9 +773,9 @@ The majority of screens that I work on are 1080p so having emacs full screen by 
 Should I switch to higher resolution displays this will likely become system dependent.
 #+begin_src emacs-lisp
 ;; auto fullscreen
-(if (eq initial-window-system 'x)                 ; if started by emacs command or desktop file
-    (toggle-frame-maximized)
-  (toggle-frame-fullscreen))
+;; (if (eq initial-window-system 'x)                 ; if started by emacs command or desktop file
+;;     (toggle-frame-maximized)
+;;   (toggle-frame-fullscreen))
 #+end_src
 #TODO: make this work with wayland
 
@@ -2332,22 +2351,22 @@ a straight rip of the doom config
 (file+olp+datetree +org-capture-journal-file)
 "* %U %?\n%i\n%a" :prepend t)
 
-("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-        "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-        "* %? [[%:link][%:description]] \nCaptured On: %U")
+("w" "Web Capture" entry
+(file+headline +org-capture-todo-file "Inbox")
+"* %?\n:LOGBOOK:\n- Added: %U\n:END:\n\n%i\n%a" :prepend t)
+
 ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
 ;; {todo,notes,changelog}.org file is found in a parent directory.
 ;; Uses the basename from `+org-capture-todo-file',
 ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
-("P" "Templates for projects")
-("Pt" "Project-local todo" entry  ; {project-root}/todo.org
+("p" "Templates for projects")
+("pt" "Project-local todo" entry  ; {project-root}/todo.org
 (file+headline +org-capture-project-todo-file "Inbox")
 "* TODO %?\n%i\n%a" :prepend t)
-("Pn" "Project-local notes" entry  ; {project-root}/notes.org
+("pn" "Project-local notes" entry  ; {project-root}/notes.org
 (file+headline +org-capture-project-notes-file "Inbox")
 "* %U %?\n%i\n%a" :prepend t)
-("Pc" "Project-local changelog" entry  ; {project-root}/changelog.org
+("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
 (file+headline +org-capture-project-changelog-file "Unreleased")
 "* %U %?\n%i\n%a" :prepend t)
 
@@ -2406,6 +2425,25 @@ just set where I want things to be
   (setq conda-anaconda-home (expand-file-name "/opt/miniconda3/")
         conda-env-home-directory (expand-file-name "~/.conda"))
   )
+#+end_src
+** Graphviz
+Graphviz is a nice method of visualising simple graphs, based on plaintext
+=.dot= / =.gv= files.
+#+begin_src emacs-lisp :tangle packages.el
+(package! graphviz-dot-mode :pin "6e96a89762760935a7dff6b18393396f6498f976")
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! graphviz-dot-mode
+  :commands graphviz-dot-mode
+  :mode ("\\.dot\\'" . graphviz-dot-mode)
+  :init
+  (after! org
+    (setcdr (assoc "dot" org-src-lang-modes)
+            'graphviz-dot)))
+
+(use-package! company-graphviz-dot
+  :after graphviz-dot-mode)
 #+end_src
 
 *   The rest
