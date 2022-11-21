@@ -141,6 +141,7 @@ Simply don't' add src_elisp{+numbers} to src_elisp{ui: window-select}
 TODO: consider a better face for it
 *** Embark for window switching
 #+begin_src emacs-lisp
+(after! embark
 (eval-when-compile
   (defmacro my/embark-ace-action (fn)
     `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
@@ -154,6 +155,7 @@ TODO: consider a better face for it
 (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
 (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
 (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+)
 #+end_src
 
 **  Doom Config
