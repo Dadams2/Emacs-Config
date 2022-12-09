@@ -142,19 +142,19 @@ TODO: consider a better face for it
 *** Embark for window switching
 #+begin_src emacs-lisp
 (after! embark
-(eval-when-compile
-  (defmacro my/embark-ace-action (fn)
-    `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-       (interactive)
-       (with-demoted-errors "%s"
-         (require 'ace-window)
-         (let ((aw-dispatch-always t))
-           (aw-switch-to-window (aw-select nil))
-           (call-interactively (symbol-function ',fn)))))))
+    (eval-when-compile
+    (defmacro my/embark-ace-action (fn)
+        `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+        (interactive)
+        (with-demoted-errors "%s"
+            (require 'ace-window)
+            (let ((aw-dispatch-always t))
+            (aw-switch-to-window (aw-select nil))
+            (call-interactively (symbol-function ',fn)))))))
 
-(define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
-(define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
-(define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+    (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
+    (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
+    (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
 )
 #+end_src
 
@@ -1113,9 +1113,12 @@ TODO: handle automated setup
 I have yet to find something I want to change about magit. Maybe magit delta can be put to use.
 #+begin_src emacs-lisp
 
-;; (after! magit
-;;   (magit-delta-mode +1))
+(after! magit
+  (magit-delta-mode +1))
 
+; Fix dumb thing of magit not finding delta
+(after! magit-delta
+  (setq magit-delta-delta-executable "~/.cargo/bin/delta"))
 #+end_src
 
 *** Company
