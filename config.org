@@ -2223,6 +2223,7 @@ The beginning of a great journey
 (setq org-enforce-todo-dependencies t)
 (setq org-track-ordered-property-with-tag t) ;; make it more visible that things are ordered
 (setq org-refile-allow-creating-parent-nodes t)
+(setq org-clock-into-drawer "CLOCKING")
 ;; (setq org-archive-location "~/Org/Archive.org::datetree/* Finished Tasks")
 
   (setq org-refile-targets
@@ -2395,6 +2396,13 @@ a straight rip of the doom config
 "* %U %?\n %i\n %a"
 :heading "Changelog"
 :prepend t)))
+#+end_src
+**** latex interactions
+#+begin_src emacs-lisp
+(setq org-latex-packages-alist
+      (quote (("" "color" t)
+          ("" "parskip" t)
+          ("" "tikz" t))))
 #+end_src
 *** Roam
 just set where I want things to be
