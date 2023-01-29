@@ -20,6 +20,7 @@
   - [[#org][Org]]
   - [[#python][Python]]
   - [[#graphviz][Graphviz]]
+  - [[#regex][Regex]]
 -   [[#the-rest][The rest]]
 
 * Preamble
@@ -115,9 +116,9 @@ and when I do I would like to be promoted for what buffer to switch to
 
 
 #+begin_src emacs-lisp
-;; (defadvice! prompt-for-buffer (&rest _)
-;;   :after '(evil-window-split evil-window-vsplit)
-;;   (consult-buffer))
+(defadvice! prompt-for-buffer (&rest _)
+  :after '(evil-window-split evil-window-vsplit)
+  (consult-buffer))
 #+end_src
 
 being able to rotate window layouts is nice
@@ -1012,7 +1013,7 @@ Ligature's are still an issue for me. Especially python. So I have done a bit of
 till I figure out what I want
 #+begin_src emacs-lisp
 (setq +ligatures-extras-in-modes '(elisp-mode org-mode))
-(setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
+;; (setq +ligatures-in-modes '(not special-mode comint-mode eshell-mode term-mode vterm-mode Info-mode python-mode))
 #+end_src
 
 *** Rotate (window management)
@@ -1130,9 +1131,9 @@ the thing that is most likely going to slow down my typing experience.
 (after! company
   (setq company-idle-delay 0.5
         company-minimum-prefix-length 3
-        company-show-numbers t)
-  (add-hook
-   'evil-normal-state-entry-hook #'company-abort))
+        company-show-numbers t))
+  ;; (add-hook
+  ;;  'evil-normal-state-entry-hook #'company-abort))
 #+end_src
 
 Also a good idea to improve memory:
@@ -2459,6 +2460,12 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
   :after graphviz-dot-mode)
 #+end_src
 
+** Regex
+
+#+begin_src emacs-lisp
+(setq reb-re-syntax 'string)
+#+end_src
+
 *   The rest
 
 #+begin_src emacs-lisp
@@ -2482,8 +2489,51 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
       (message "Slot is empty/invalid."))))
 
 
-#+end_src
+(defun da-clean-dead ()
+  (interactive)
+  (goto-char (point-min))
+  (if (re-search-forward "\\([[:digit:]]+\\) \\(\\([[:digit:]]+:\\)+\\) WARNING: com.dugeo.util.swing.DeadlockDetector$DeadlockException" nil t)
+    (let ((capture1 (match-string 1))
+        (capture2 (match-string 2)))
+        (message "Captured groups: %s, %s" capture1 capture2)
+    ;; (replace-regexp (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang.") )
+    ;; (replace-regexp (concat capture1 " " capture2) ""))
+    (da-replace-regex-whole-buffer  (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang."))
+    (da-delete-regex-whole-buffer  (concat capture1 " " capture2))
+    (da-clean-stacktrace)
+    ))
+  )
 
+(defun da-clean-stacktrace ()
+;; should have datetime removed
+    (da-delete-regex-whole-buffer "^[[:space:]]+at[[:space:]].*model\\.property\\..*")
+    (da-delete-regex-whole-buffer "^.*Lambda\$[[:digit:]]+.*")
+    (da-delete-regex-whole-buffer "^.*DebugIfSlowEvent\.debugIfSlowOnEDT.*")
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^[[:space:]]+at[[:space:]].*$" nil t)
+        (replace-regexp ",[[:space:]]" ",")
+      )
+  )
+  )
+
+(defun da-delete-regex-whole-buffer (regex)
+  (save-excursion
+    (goto-char (point-min))
+    (delete-matching-lines regex)
+    )
+  )
+
+(defun da-replace-regex-whole-buffer (regex replace)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward regex nil t)
+        (replace-match replace)
+      )
+  )
+)
+
+#+end_src
 
 #+begin_src emacs-lisp :tangle "packages.el" :comments no
 ;; -*- no-byte-compile: t; -*-
@@ -2496,6 +2546,7 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (package! impatient-mode)
 (package! ox-gfm)
 (package! ztree)
+(package! pair-tree)
 ;; (unpin! mu4e)
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
