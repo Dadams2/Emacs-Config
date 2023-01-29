@@ -468,7 +468,7 @@ there are other things to consider as well
 ;;emms              ; Multimedia in Emacs is music to my ears
 everywhere          ; *leave* Emacs!? You must be joking
 irc                 ; how neckbeards socialize
-;;(rss +org)        ; emacs as an RSS reader
+(rss +org)          ; emacs as an RSS reader
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
 
