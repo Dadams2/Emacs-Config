@@ -1,5 +1,7 @@
 #+title: Doom Emacs Configuration
+#+subtitle: Taming the Tyranny of Text Transformation
 #+author: Dadams
+#+startup: content
 
 * Table of Contents :TOC:
 - [[#preamble][Preamble]]
@@ -1046,7 +1048,6 @@ This simply disables the global =C-h= for help.
 
 ** Tools
 
-
 *** Very Large files
 
 title is self explanatory. Why not chunk files?
@@ -1120,6 +1121,18 @@ I have yet to find something I want to change about magit. Maybe magit delta can
 ; Fix dumb thing of magit not finding delta
 (after! magit-delta
   (setq magit-delta-delta-executable "~/.cargo/bin/delta"))
+#+end_src
+
+
+Keymaps are a pain at the best of times and I couldn't get the normal maps to work
+#+begin_src emacs-lisp
+(after! evil-collection-magit
+(evil-collection-define-key 'normal
+  'evil-collection-magit-toggle-text-minor-mode-map
+  "\C-t" '+workspace/new)
+(evil-collection-define-key evil-collection-magit-state 'magit-mode-map
+  "\C-t" '+workspace/new)
+)
 #+end_src
 
 *** Company
