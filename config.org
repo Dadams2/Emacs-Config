@@ -24,6 +24,7 @@
   - [[#graphviz][Graphviz]]
   - [[#regex][Regex]]
 -   [[#the-rest][The rest]]
+- [[#other-packages][Other packages]]
 
 * Preamble
 
@@ -1050,17 +1051,121 @@ This simply disables the global =C-h= for help.
 
 *** Very Large files
 
-title is self explanatory. Why not chunk files?
-#+begin_src emacs-lisp
-;; (package! vlf :recipe (:host github :repo "m00natic/vlfi" :files ("*.el"))
-;;   :pin "cc02f2533782d6b9b628cec7e2dcf25b2d05a27c" :disable t)
-#+end_src
-as it is something I use infrequently I don't want it to delay start up
-#+begin_src emacs-lisp
-;; (use-package! vlf-setup
-;;   :defer-incrementally vlf-tune vlf-base vlf-write vlf-search vlf-occur vlf-follow vlf-ediff vlf)
+The /very large files/ mode loads large files in chunks, allowing one to open
+ridiculously large files.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! vlf :recipe (:host github :repo "emacs-straight/vlf" :files ("*.el"))
+  :pin "cacdb359f8c37c6e7e4c7937462b632d22462130")
 #+end_src
 
+To make VLF available without delaying startup, we'll just load it in quiet moments.
+
+#+begin_src emacs-lisp :noweb no-export :noweb-prefix no
+(use-package! vlf-setup
+  :defer-incrementally vlf-tune vlf-base vlf-write
+  vlf-search vlf-occur vlf-follow vlf-ediff vlf
+  :commands vlf vlf-mode
+  :init
+  <<vlf-largefile-prompt>>
+  :config
+  (advice-remove 'abort-if-file-too-large #'ad-Advice-abort-if-file-too-large)
+  <<vlf-linenum-offset>>
+  <<vlf-search-chunking>>)
+#+end_src
+
+Now, there are one or two tweaks worth applying to VLF. For starters, it goes to
+the liberty of advising ~abort-if-file-too-large~, and in doing so removes the
+option of opening files literally. I think that's a bit much, so we can remove
+the advice and instead override ~files--ask-user-about-large-file~ (the more
+appropriate function, I think) as a simpler approach, just sacrificing the
+original behaviour with src_elisp{(setq vlf-application 'always)} (which I can't
+imagine using anyway).
+
+#+name: vlf-largefile-prompt
+#+begin_src emacs-lisp :noweb-ref none
+(defadvice! +files--ask-about-large-file-vlf (size op-type filename offer-raw)
+  "Like `files--ask-user-about-large-file', but with support for `vlf'."
+  :override #'files--ask-user-about-large-file
+  (if (eq vlf-application 'dont-ask)
+      (progn (vlf filename) (error ""))
+    (let ((prompt (format "File %s is large (%s), really %s?"
+                          (file-name-nondirectory filename)
+                          (funcall byte-count-to-string-function size) op-type)))
+      (if (not offer-raw)
+          (if (y-or-n-p prompt) nil 'abort)
+        (let ((choice
+               (car
+                (read-multiple-choice
+                 prompt '((?y "yes")
+                          (?n "no")
+                          (?l "literally")
+                          (?v "vlf"))
+                 (files--ask-user-about-large-file-help-text
+                  op-type (funcall byte-count-to-string-function size))))))
+          (cond ((eq choice ?y) nil)
+                ((eq choice ?l) 'raw)
+                ((eq choice ?v)
+                 (vlf filename)
+                 (error ""))
+                (t 'abort)))))))
+#+end_src
+
+As you go from one chunk fetched by VLF to the next, the displayed line number
+of the first line /in each chunk/ is unchanged. I think it's reasonable to hope
+for an /overall/ line number, and by tracking chunk's cumulative line numbers we
+can implement this behaviour fairly easily.
+
+#+name: vlf-linenum-offset
+#+begin_src emacs-lisp :noweb-ref none
+(defvar-local +vlf-cumulative-linenum '((0 . 0))
+  "An alist keeping track of the cumulative line number.")
+
+(defun +vlf-update-linum ()
+  "Update the line number offset."
+  (let ((linenum-offset (alist-get vlf-start-pos +vlf-cumulative-linenum)))
+    (setq display-line-numbers-offset (or linenum-offset 0))
+    (when (and linenum-offset (not (assq vlf-end-pos +vlf-cumulative-linenum)))
+      (push (cons vlf-end-pos (+ linenum-offset
+                                 (count-lines (point-min) (point-max))))
+            +vlf-cumulative-linenum))))
+
+(add-hook 'vlf-after-chunk-update-hook #'+vlf-update-linum)
+
+;; Since this only works with absolute line numbers, let's make sure we use them.
+(add-hook! 'vlf-mode-hook (setq-local display-line-numbers t))
+#+end_src
+
+The other thing that doesn't work too well with VLF is searching with anything
+other than =M-x occur=. This is because trying to go to the next match at the end
+of a chunk usually wraps the point to the beginning of the chunk, instead of
+moving to the next chunk.
+
+#+name: vlf-search-chunking
+#+begin_src emacs-lisp :noweb-ref none
+(defun +vlf-next-chunk-or-start ()
+  (if (= vlf-file-size vlf-end-pos)
+      (vlf-jump-to-chunk 1)
+    (vlf-next-batch 1))
+  (goto-char (point-min)))
+
+(defun +vlf-last-chunk-or-end ()
+  (if (= 0 vlf-start-pos)
+      (vlf-end-of-file)
+    (vlf-prev-batch 1))
+  (goto-char (point-max)))
+
+(defun +vlf-isearch-wrap ()
+  (if isearch-forward
+      (+vlf-next-chunk-or-start)
+    (+vlf-last-chunk-or-end)))
+
+(add-hook! 'vlf-mode-hook (setq-local isearch-wrap-function #'+vlf-isearch-wrap))
+#+end_src
+
+
+Unfortunately, since evil-search doesn't have an analogue to
+~isearch-wrap-function~, we can't easily add support to it.
 *** Eros
 
 #+begin_quote
@@ -1424,6 +1529,13 @@ its currently not enabled as a module flag in doom so we need to do it ourself
 ))
 #+end_src
 
+*** Centaur Tabs
+
+There is currently an issue when running in daemon mode [[https://github.com/doomemacs/doomemacs/issues/6647][here]]. The following seems to fix it.
+#+begin_src emacs-lisp
+(after! centaur-tabs
+  (setq centaur-tabs-set-bar 'right))
+#+end_src
 
 ** File Types
 
@@ -2230,7 +2342,11 @@ The beginning of a great journey
 (setq org-agenda-files '("~/Org/experiments.org"
                          "~/Org/mylife.org"
                          "~/Org/birthday.org"))
+
+(setq org-return-follows-link t) ;; I like following links
+(setq org-use-speed-commands t) ;; gotta go fast
 (setq org-deadline-past-days 14)
+(setq org-deadline-warning-days 30)
 (setq org-agenda-start-with-log-mode t)
 (setq org-log-done t)
 (setq org-log-reschedule t)
@@ -2248,6 +2364,24 @@ The beginning of a great journey
 
   ;; Save Org buffers after refiling!
   (advice-add 'org-refile :after 'org-save-all-org-buffers)
+#+end_src
+*** Modules
+#+begin_src emacs-lisp
+(after! org
+  (setq org-modules
+    '(;; ol-w3m
+      ;; ol-bbdb
+     ol-bibtex
+     ol-habit
+      ;; ol-docview
+      ;; ol-gnus
+      ;; ol-info
+      ;; ol-irc
+      ;; ol-mhe
+      ;; ol-rmail
+      ;; ol-eww
+      ))
+  )
 #+end_src
 
 *** Config
@@ -2307,7 +2441,10 @@ The beginning of a great journey
 #+end_src
 **** Todo Keywords
 
+The ~@~ character indicates note with timestamp and ~!~ is just timestamp
+~@/!~ note recorded when entering and timestamp when leaving
 #+begin_src emacs-lisp
+
   (setq org-todo-keywords
         '((sequence
            "TODO(t@/!)"       ; A task that needs doing & is ready to do
@@ -2481,7 +2618,6 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 #+end_src
 
 *   The rest
-
 #+begin_src emacs-lisp
 
 
@@ -2503,20 +2639,21 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
       (message "Slot is empty/invalid."))))
 
 
-(defun da-clean-dead ()
-  (interactive)
-  (goto-char (point-min))
-  (if (re-search-forward "\\([[:digit:]]+\\) \\(\\([[:digit:]]+:\\)+\\) WARNING: com.dugeo.util.swing.DeadlockDetector$DeadlockException" nil t)
-    (let ((capture1 (match-string 1))
-        (capture2 (match-string 2)))
-        (message "Captured groups: %s, %s" capture1 capture2)
-    ;; (replace-regexp (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang.") )
-    ;; (replace-regexp (concat capture1 " " capture2) ""))
-    (da-replace-regex-whole-buffer  (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang."))
-    (da-delete-regex-whole-buffer  (concat capture1 " " capture2))
-    (da-clean-stacktrace)
-    ))
+(defun da-delete-regex-whole-buffer (regex)
+  (save-excursion
+    (goto-char (point-min))
+    (delete-matching-lines regex)
+    )
   )
+
+(defun da-apply-regex-whole-buffer (regex replace)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward regex nil t)
+        (replace-match replace)
+      )
+  )
+)
 
 (defun da-clean-stacktrace ()
 ;; should have datetime removed
@@ -2527,28 +2664,28 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
     (goto-char (point-min))
     (while (re-search-forward "^[[:space:]]+at[[:space:]].*$" nil t)
         (replace-regexp ",[[:space:]]" ",")
-      )
-  )
-  )
-
-(defun da-delete-regex-whole-buffer (regex)
-  (save-excursion
-    (goto-char (point-min))
-    (delete-matching-lines regex)
-    )
-  )
-
-(defun da-replace-regex-whole-buffer (regex replace)
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward regex nil t)
         (replace-match replace)
       )
   )
 )
 
+(defun da-clean-dead ()
+  (interactive)
+  (goto-char (point-min))
+  (if (re-search-forward "\\([[:digit:]]+\\) \\(\\([[:digit:]]+:\\)+\\) WARNING: com.dugeo.util.swing.DeadlockDetector$DeadlockException" nil t)
+    (let ((capture1 (match-string 1))
+        (capture2 (match-string 2)))
+        (message "Captured groups: %s, %s" capture1 capture2)
+    (da-apply-regex-whole-buffer  (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang."))
+    (da-apply-regex-whole-buffer  (concat capture1 " " capture2) "")
+    (da-clean-stacktrace)
+    ))
+  )
+
+
 #+end_src
 
+* Other packages
 #+begin_src emacs-lisp :tangle "packages.el" :comments no
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
@@ -2562,7 +2699,6 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (package! pair-tree)
 (package! org-jira)
 (package! restclient)
-;; (unpin! mu4e)
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
