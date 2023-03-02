@@ -403,7 +403,7 @@ emacs-lisp          ; drown in parentheses
  +lsp
  +tree-sitter)      ; At least it ain't XML
 (java
- +lsp
+ ;; +lsp
  +tree-sitter)      ; the poster child for carpal tunnel syndrome
 (javascript +lsp)   ; all(hope(abandon(ye(who(enter(here))))))
 (julia +lsp)        ; a better, faster MATLAB
@@ -438,7 +438,7 @@ latex               ; writing papers in Emacs has never been so fun
 ;;rest              ; Emacs as a REST client
 ;;rst               ; ReST in peace
 ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
 ;;scala             ; java, but good
 ;;(scheme +guile)   ; a fully conniving family of lisps
 (sh +lsp)           ; she sells {ba,z,fi}sh shells on the C xor
@@ -800,7 +800,7 @@ There are only a few things I do on the dashboard. So why not make them quicker 
         :desc "Open dotfile" :ne "." (cmd! (doom-project-find-file "~/.config/"))
         :desc "Notes (roam)" :ne "n" #'org-roam-node-find
         :desc "Switch buffer" :ne "b" #'+vertico/switch-workspace-buffer
-        :desc "Switch buffers (all)" :ne "B" #'consult-buffer
+        :desc "Switch buffers (all)" :ne "<" #'consult-buffer
         :desc "IBuffer" :ne "i" #'ibuffer
         :desc "Open Project" :ne "p" #'projectile-switch-project
         :desc "Open Mail" :ne "m" #'mu4e
@@ -2555,11 +2555,12 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 ;; To install a package with Doom you must declare them here and run 'doom sync'
 ;; on the command line, then restart Emacs for the changes to take effect -- or
 ;; use 'M-x doom/reload'.
-
 (package! impatient-mode)
 (package! ox-gfm)
 (package! ztree)
 (package! pair-tree)
+(package! org-jira)
+(package! restclient)
 ;; (unpin! mu4e)
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
