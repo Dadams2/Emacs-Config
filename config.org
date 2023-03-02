@@ -1417,10 +1417,11 @@ TODO: add system installation for delta
 its currently not enabled as a module flag in doom so we need to do it ourself
 #+begin_src emacs-lisp
 (after! magit
-  (magit-delta-mode +1))
+  (magit-delta-mode +1)
 (setq
     magit-delta-default-dark-theme "Nord"
-    magit-delta-default-light-theme "OneHalfLight")
+    magit-delta-default-light-theme "OneHalfLight"
+))
 #+end_src
 
 
