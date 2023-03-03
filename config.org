@@ -2634,10 +2634,11 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 
 *   The rest
 
-#+begin_src emacs-lisp :tangle (if `(string-equal (user-login-name) "davida") "yes" "no")
+#+begin_src emacs-lisp (if (not (string-equal (user-login-name) "davida")) "tangle: no")
     (setq user-emacs-directory "/localData/shared/davida/.emacs.d")
     (setq projectile-project-search-path '("/localData/shared/davida/"))
 #+end_src
+
 
 #+begin_src emacs-lisp
 (defun execute-macro-slow (&optional slot delay rand-delay)
