@@ -60,9 +60,9 @@ Sometimes I want things to be slightly different if I am at work
   "Return t if current user is davida, nil otherwise."
   `(string-equal (user-login-name) "davida"))
 
-(defmacro da/sub-work (home work)
+(defun da/sub-work (home work)
   "Return HOME if the current user is not davida, WORK otherwise."
-  `(if (da/at-work) work home))
+  (if (da/at-work) work home))
 #+end_src
 
 ** Personal info
