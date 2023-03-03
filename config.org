@@ -6,6 +6,7 @@
 * Table of Contents :TOC:
 - [[#preamble][Preamble]]
 - [[#the-simple-stuff][The simple stuff]]
+  - [[#work-config][Work config]]
   - [[#personal-info][Personal info]]
   - [[#default-settings][Default settings]]
   -  [[#doom-config][Doom Config]]
@@ -24,6 +25,7 @@
   - [[#graphviz][Graphviz]]
   - [[#regex][Regex]]
 -   [[#the-rest][The rest]]
+- [[#org-jira-things][Org Jira things]]
 - [[#other-packages][Other packages]]
 
 * Preamble
@@ -50,6 +52,19 @@ apparently this makes things run faster (I found it [[https://nullprogram.com/bl
 #!/usr/bin/env bash
 #+end_src
 
+** Work config
+
+Sometimes I want things to be slightly different if I am at work
+#+begin_src emacs-lisp
+(defmacro da/at-work ()
+  "Return t if current user is davida, nil otherwise."
+  `(string-equal (user-login-name) "davida"))
+
+(defmacro da/sub-work (home work)
+  "Return HOME if the current user is not davida, WORK otherwise."
+  `(if (da/at-work) work home))
+#+end_src
+
 ** Personal info
 
 From ~GPG~ to ~git~ to email clients and snippets, the following seems kinda important to have around
@@ -58,12 +73,12 @@ From ~GPG~ to ~git~ to email clients and snippets, the following seems kinda imp
       user-mail-address "dbadams@iinet.net.au")
 #+end_src
 
+
 *** GPG
 #+begin_src emacs-lisp
-(setq auth-sources '("~/.authinfo.gpg")
+(setq auth-sources (da/sub-work '("~/.authinfo.gpg") '("~/.authinfo"))
       auth-source-cache-expiry nil) ; default is 7200 (2h)
 #+end_src
-
 ** Default settings
 
 *** Common settings
@@ -557,7 +572,7 @@ I like the softer look of Nord and use it in a number of other places. There are
 but overall its nice.
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-nord)
+(setq doom-theme (da/sub-work 'doom-nord 'doom-vibrant))
 #+end_src
 
 I use linux on all my systems so I don't need to be told that =LF UTF-8= is my file encoding all the time
@@ -2339,6 +2354,7 @@ The beginning of a great journey
 *** Basic configuration
 #+begin_src emacs-lisp
 (setq org-directory "~/Org/")
+(setq +org-capture-todo-file (da/sub-work "~/Org/todo.org" "~/Org/work/todo.org"))
 (setq org-agenda-files '("~/Org/experiments.org"
                          "~/Org/mylife.org"
                          "~/Org/birthday.org"))
@@ -2354,9 +2370,8 @@ The beginning of a great journey
 (setq org-enforce-todo-dependencies t)
 (setq org-track-ordered-property-with-tag t) ;; make it more visible that things are ordered
 (setq org-refile-allow-creating-parent-nodes t)
+(setq org-archive-location (da/sub-work "~/Org/Archive.org::datetree/* Finished Tasks " "~/Org/work/work_archive.org::datetree/ "))
 (setq org-clock-into-drawer "CLOCKING")
-;; (setq org-archive-location "~/Org/Archive.org::datetree/* Finished Tasks")
-
   (setq org-refile-targets
     '(("Archive.org" :maxlevel . 1)
       ("mylife.org" :maxlevel . 1)
@@ -2618,9 +2633,13 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 #+end_src
 
 *   The rest
+
+#+begin_src emacs-lisp :tangle (if `(string-equal (user-login-name) "davida") "yes" "no")
+    (setq user-emacs-directory "/localData/shared/davida/.emacs.d")
+    (setq projectile-project-search-path '("/localData/shared/davida/"))
+#+end_src
+
 #+begin_src emacs-lisp
-
-
 (defun execute-macro-slow (&optional slot delay rand-delay)
   (interactive)
   (let ((macro (append (evil-get-register (or slot (read-char "@-")) t) nil))
@@ -2682,7 +2701,12 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
     ))
   )
 
+#+end_src
 
+* Org Jira things
+
+#+begin_src emacs-lisp
+(setq jiralib-url "https://jira.dug.com")
 #+end_src
 
 * Other packages
