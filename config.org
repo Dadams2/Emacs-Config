@@ -19,6 +19,7 @@
   - [[#file-types][File Types]]
 - [[#applications][Applications]]
   - [[#mail][Mail]]
+  - [[#rssnewsfeed-reader][RSS/Newsfeed Reader]]
 - [[#languages][Languages]]
   - [[#org][Org]]
   - [[#python][Python]]
@@ -2337,6 +2338,16 @@ eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Unti
 (package! mu4e-alert
  :recipe (:host github :repo "xzz53/mu4e-alert"))
 #+end_src
+** RSS/Newsfeed Reader
+
+elfeed is great
+#+begin_src emacs-lisp
+(after! elfeed
+  (map! :leader
+        (:prefix-map ("o" . "open")
+         "l" #'elfeed)))
+#+end_src
+
 
 * Languages
 
@@ -2387,7 +2398,6 @@ The beginning of a great journey
     '(;; ol-w3m
       ;; ol-bbdb
      ol-bibtex
-     ol-habit
       ;; ol-docview
       ;; ol-gnus
       ;; ol-info
@@ -2711,6 +2721,7 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 #+end_src
 
 * Other packages
+
 #+begin_src emacs-lisp :tangle "packages.el" :comments no
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
@@ -2724,7 +2735,7 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (package! pair-tree)
 (package! org-jira)
 (package! restclient)
-
+(package! org-web-tools)
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
