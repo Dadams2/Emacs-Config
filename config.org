@@ -413,7 +413,7 @@ emacs-lisp          ; drown in parentheses
 ;;gdscript          ; the language you waited for
 ;;(go +lsp)         ; the hipster dialect
 ;;(graphql +lsp)    ; Give queries a REST
-;;(haskell +lsp)    ; a language that's lazier than I am
+(haskell)    ; a language that's lazier than I am
 ;;hy                ; readability of scheme w/ speed of python
 ;;idris             ; a language you can depend on
 (json
@@ -440,6 +440,7 @@ latex               ; writing papers in Emacs has never been so fun
  +roam2
  +gnuplot
  +dragndrop
+ +contacts
  +jupyter)          ; organize your plain life in plain text
 ;;php               ; perl's insecure younger brother
 ;;plantuml          ; diagrams for confusing people more
@@ -509,8 +510,8 @@ TODO: due to a bug in async tangle we don't include this
 
 I am a big fan of 'Fira Code'. Font sizes do need some fiddling to get it all right.
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Fira Code Nerd Font" :size 16)
-      doom-big-font (font-spec :family "Fira Code Nerd Font" :size 24)
+(setq doom-font (font-spec :family "Fira Code" :size 16)
+      doom-big-font (font-spec :family "Fira Code" :size 24)
       doom-variable-pitch-font (font-spec :family "Overpass" :size 24)
       doom-unicode-font (font-spec :family "JuliaMono")
       doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
@@ -810,20 +811,22 @@ There are only a few things I do on the dashboard. So why not make them quicker 
 (defun +doom-dashboard-setup-modified-keymap ()
   (setq +doom-dashboard-mode-map (make-sparse-keymap))
   (map! :map +doom-dashboard-mode-map
-        :desc "Find file" :ne "f" #'find-file
-        :desc "Recent files" :ne "r" #'consult-recent-file
-        :desc "Config dir" :ne "C" #'doom/open-private-config
-        :desc "Open config.org" :ne "c" (cmd! (find-file (expand-file-name "config.org" doom-private-dir)))
-        :desc "Open dotfile" :ne "." (cmd! (doom-project-find-file "~/.config/"))
-        :desc "Notes (roam)" :ne "n" #'org-roam-node-find
-        :desc "Switch buffer" :ne "b" #'+vertico/switch-workspace-buffer
-        :desc "Switch buffers (all)" :ne "<" #'consult-buffer
-        :desc "IBuffer" :ne "i" #'ibuffer
-        :desc "Open Project" :ne "p" #'projectile-switch-project
-        :desc "Open Mail" :ne "m" #'mu4e
-        :desc "Set theme" :ne "t" #'consult-theme
-        :desc "Quit" :ne "Q" #'save-buffers-kill-terminal
-        :desc "Show keybindings" :ne "h" (cmd! (which-key-show-keymap '+doom-dashboard-mode-map))))
+        :desc "Find file" :ng "f" #'find-file
+        :desc "Recent files" :ng "r" #'consult-recent-file
+        :desc "Config dir" :ng "C" #'doom/open-private-config
+        :desc "Open config.org" :ng "c" (cmd! (find-file (expand-file-name "config.org" doom-private-dir)))
+        :desc "Open dotfile" :ng "." (cmd! (doom-project-find-file "~/.config/"))
+        :desc "Notes (roam)" :ng "n" #'org-roam-node-find
+        :desc "Switch buffer" :ng "b" #'+vertico/switch-workspace-buffer
+        :desc "Open Vterm" :ng "v" #'+vterm/here
+        :desc "Open Elfeed" :ng "l" #'elfeed
+        :desc "Switch buffers (all)" :ng "<" #'consult-buffer
+        :desc "IBuffer" :ng "i" #'ibuffer
+        :desc "Open Project" :ng "p" #'projectile-switch-project
+        :desc "Open Mail" :ng "m" #'mu4e
+        :desc "Set theme" :ng "t" #'consult-theme
+        :desc "Quit" :ng "Q" #'save-buffers-kill-terminal
+        :desc "Show keybindings" :ng "h" (cmd! (which-key-show-keymap '+doom-dashboard-mode-map))))
 
 (add-transient-hook! #'+doom-dashboard-mode (+doom-dashboard-setup-modified-keymap))
 (add-transient-hook! #'+doom-dashboard-mode :append (+doom-dashboard-setup-modified-keymap))
@@ -2523,8 +2526,15 @@ The ~@~ character indicates note with timestamp and ~!~ is just timestamp
 **** Capture Templates
 a straight rip of the doom config
 #+begin_src emacs-lisp
+(defvar my/org-contacts-template
+    (concat "* %(org-contacts-template-name)\n"
+            ":PROPERTIES:\n"
+            ":EMAIL: %^{EMAIL}\n"
+            ":NOTE: %^{NOTE}\n"
+            ":END:") "Template for a contact.")
+
 (setq org-capture-templates
-'(("t" "Personal todo" entry
+`(("t" "Personal todo" entry
 (file+headline +org-capture-todo-file "Inbox")
 "* TODO %?\n%i:LOGBOOK:\n- Added: %U\n:END:\n\n%a" :prepend t)
 ("n" "Personal notes" entry
@@ -2553,6 +2563,9 @@ a straight rip of the doom config
 (file+headline +org-capture-project-changelog-file "Unreleased")
 "* %U %?\n%i\n%a" :prepend t)
 
+("c" "Contact" entry (file+headline "~/Org/contacts.org" "Inbox"),
+      my/org-contacts-template
+      :empty-lines 1)
 ;; Will use {org-directory}/{+org-capture-projects-file} and store
 ;; these under {ProjectName}/{Tasks,Notes,Changelog} headings. They
 ;; support `:parents' to specify what headings to put them under, e.g.
@@ -2607,6 +2620,12 @@ just set where I want things to be
          :immediate-finish t
          :unnarrowed t)))
 #+end_src
+*** Contacts
+#+begin_src emacs-lisp
+(after! org-contacts
+  (setq org-contacts-files '("~/Org/contacts.org")))
+#+end_src
+
 
 ** Python
 
@@ -2643,12 +2662,6 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 #+end_src
 
 *   The rest
-
-#+begin_src emacs-lisp (if (not (string-equal (user-login-name) "davida")) "tangle: no")
-    (setq user-emacs-directory "/localData/shared/davida/.emacs.d")
-    (setq projectile-project-search-path '("/localData/shared/davida/"))
-#+end_src
-
 
 #+begin_src emacs-lisp
 (defun execute-macro-slow (&optional slot delay rand-delay)
@@ -2712,8 +2725,21 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
     ))
   )
 
-#+end_src
+;; set auto mode for keymaps
 
+(add-to-list 'auto-mode-alist '("\\.keymap\\'" . c-mode))
+
+;; fun with link inserts
+;; todo make this get the window title and fix other stuff
+(defun insert-firefox-url ()
+  "Insert the URL of the currently open tab in Firefox."
+  (interactive)
+  (setq script-path (expand-file-name "get_firefox_url.sh" doom-private-dir))
+  (setq url (shell-command-to-string script-path))
+  (setq url (string-trim url)) ; Remove leading/trailing whitespace
+  (insert (format "[[%s][%s]]" url url)))
+
+#+end_src
 * Org Jira things
 
 #+begin_src emacs-lisp
@@ -2736,6 +2762,8 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (package! org-jira)
 (package! restclient)
 (package! org-web-tools)
+(unpin! mu4e)
+(unpin! evil-collection)
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
