@@ -2620,6 +2620,21 @@ just set where I want things to be
          :immediate-finish t
          :unnarrowed t)))
 #+end_src
+*** Jupyter notebook
+#+begin_src emacs-lisp
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (julia . t)
+   (python . t)
+   (jupyter . t)))
+
+(setq org-babel-default-header-args:jupyter-python '((:async . "yes")
+                                                       (:session . "py")
+                                                       (:kernel . "python3")))
+#+end_src
+
 *** Contacts
 #+begin_src emacs-lisp
 (after! org-contacts
@@ -2739,6 +2754,18 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
   (setq url (string-trim url)) ; Remove leading/trailing whitespace
   (insert (format "[[%s][%s]]" url url)))
 
+(defun refile-all-todo-headings ()
+  "Refile all TODO headings in the current Org mode buffer."
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (when (string= "TODO" (org-get-todo-state))
+       (org-refile)))
+   "/TODO" 'tree))
+
+;; (after! tramp
+;; (setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*"))
+
 #+end_src
 * Org Jira things
 
@@ -2762,8 +2789,16 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (package! org-jira)
 (package! restclient)
 (package! org-web-tools)
+(package! catppuccin-theme)
 (unpin! mu4e)
 (unpin! evil-collection)
+(package! libmpdee
+ :recipe (:host github :repo "andyetitmoves/libmpdee"))
+(package! mingus
+ :recipe (:host github :repo "pft/mingus"))
+
+;; (package! ibrowse
+;;  :recipe (:host github :repo "nicolas-graves/ibrowse.el"))
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
