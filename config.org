@@ -810,6 +810,7 @@ There are only a few things I do on the dashboard. So why not make them quicker 
 (defun +doom-dashboard-setup-modified-keymap ()
   (setq +doom-dashboard-mode-map (make-sparse-keymap))
   (map! :map +doom-dashboard-mode-map
+        :desc "Open Org Agenda" :ng "a" #'org-agenda
         :desc "Find file" :ng "f" #'find-file
         :desc "Recent files" :ng "r" #'consult-recent-file
         :desc "Config dir" :ng "C" #'doom/open-private-config
