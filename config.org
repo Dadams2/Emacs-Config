@@ -107,7 +107,7 @@ Following in Tec's footsteps I somehow stumbled upon [[https://github.com/angryb
 (unless (string-match-p "^Power N/A" (battery)) ; On laptops...
   (display-battery-mode 1))                     ; it's nice to know how much power you have
 
-(global-subword-mode 1)                         ; Iterate through CamelCase words
+;; (global-subword-mode 1)                         ; Iterate through CamelCase words
 #+end_src
 
 ***  Frame sizing
@@ -516,7 +516,6 @@ I am a big fan of 'Fira Code'. Font sizes do need some fiddling to get it all ri
       doom-unicode-font (font-spec :family "JuliaMono")
       doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
       )
-
 #+end_src
 
 ***** Missing Fonts
@@ -825,6 +824,7 @@ There are only a few things I do on the dashboard. So why not make them quicker 
         :desc "Open Project" :ng "p" #'projectile-switch-project
         :desc "Open Mail" :ng "m" #'mu4e
         :desc "Set theme" :ng "t" #'consult-theme
+        :desc "Org Capture" :ng "x" #'org-capture
         :desc "Quit" :ng "Q" #'save-buffers-kill-terminal
         :desc "Show keybindings" :ng "h" (cmd! (which-key-show-keymap '+doom-dashboard-mode-map))))
 
@@ -1411,6 +1411,7 @@ Also having a personal dictionary that is separate from the original is useful
 #+begin_src emacs-lisp
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 #+end_src
+
 
 *** YASnippet
 
@@ -2475,14 +2476,14 @@ The ~@~ character indicates note with timestamp and ~!~ is just timestamp
 
   (setq org-todo-keywords
         '((sequence
-           "TODO(t@/!)"       ; A task that needs doing & is ready to do
+           "TODO(t/!)"       ; A task that needs doing & is ready to do
            "PROJ(p)"       ; A project, which usually contains other tasks
            "LOOP(r)"       ; A recurring task
            "STRT(s)"       ; A task that is in progress
            "WAIT(w@/!)"       ; Something external is holding up this task
            "HOLD(h)"       ; This task is paused/on hold because of me
            "IDEA(i)"       ; An unconfirmed and unapproved task or notion
-           "NEXT(n@/!)"       ; Something to consider doing
+           "NEXT(n/!)"       ; Something to consider doing
            "|"
            "DONE(d@)"       ; Task successfully completed
            "CANCELLED(k)") ; Task was cancelled, aborted or is no longer applicable
@@ -2601,24 +2602,40 @@ just set where I want things to be
 #+end_src
 
 #+begin_src emacs-lisp
+(map! :map org-mode-map
+      :after org
+      "C-S-n" #'org-roam-node-insert)
+#+end_src
+
+#+begin_src emacs-lisp
+
 
 (setq org-roam-capture-templates
-      '(("m" "main" plain
-         "%?"
-         :if-new (file+head "main/${slug}.org"
-                            "#+title: ${title}\n")
-         :immediate-finish t
-         :unnarrowed t)
-        ("r" "reference" plain "%?"
-         :if-new
-         (file+head "reference/${title}.org" "#+title: ${title}\n")
-         :immediate-finish t
-         :unnarrowed t)
-        ("a" "article" plain "%?"
-         :if-new
-         (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
-         :immediate-finish t
-         :unnarrowed t)))
+      `(
+        ("d" "default" plain "%?"
+                :if-new
+                (file+head "Inbox/${title}.org" "#+title: ${title}\n")
+                :immediate-finish t
+                :unnarrowed t  )
+                ))
+;; old templates to consider for future use
+;; (setq org-roam-capture-templates
+;;       '(("m" "main" plain
+;;          "%?"
+;;          :if-new (file+head "main/${slug}.org"
+;;                             "#+title: ${title}\n")
+;;          :immediate-finish t
+;;          :unnarrowed t)
+;;         ("r" "reference" plain "%?"
+;;          :if-new
+;;          (file+head "reference/${title}.org" "#+title: ${title}\n")
+;;          :immediate-finish t
+;;          :unnarrowed t)
+;;         ("a" "article" plain "%?"
+;;          :if-new
+;;          (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
+;;          :immediate-finish t
+;;          :unnarrowed t)))
 #+end_src
 *** Jupyter notebook
 #+begin_src emacs-lisp
@@ -2641,6 +2658,24 @@ just set where I want things to be
   (setq org-contacts-files '("~/Org/contacts.org")))
 #+end_src
 
+*** org roam
+#+begin_src emacs-lisp
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+    :after org ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+#+end_src
 
 ** Python
 
@@ -2796,6 +2831,8 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
  :recipe (:host github :repo "andyetitmoves/libmpdee"))
 (package! mingus
  :recipe (:host github :repo "pft/mingus"))
+(unpin! org-roam)
+(package! org-roam-ui)
 
 ;; (package! ibrowse
 ;;  :recipe (:host github :repo "nicolas-graves/ibrowse.el"))
