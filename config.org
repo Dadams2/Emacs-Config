@@ -2382,6 +2382,7 @@ The beginning of a great journey
 (setq org-agenda-start-with-log-mode t)
 (setq org-log-done t)
 (setq org-log-reschedule t)
+(setq org-agenda-restore-windows-after-quit t) ;; return me to buffers i want to go to
 (setq org-log-into-drawer t)
 (setq org-enforce-todo-dependencies t)
 (setq org-track-ordered-property-with-tag t) ;; make it more visible that things are ordered
