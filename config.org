@@ -626,7 +626,16 @@ I literally cannot function without relative lines numbers
 #+begin_src emacs-lisp
 (setq display-line-numbers-type 'relative)
 #+end_src
+*** Bookmarks
+I like having access to bookmarks so lets save them in sane places and have a keybinding
 
+#+begin_src emacs-lisp
+(setq bookmark-default-file "~/.doom.d/bookmarks") ; I like being able to store my bookmarks properly
+
+(map! :leader
+    (:prefix-map ("b" . "buffer")
+        "C-s" 'bookmark-save))
+#+end_src
 *** Buffer names
 
 Why not take advantage of icons for the default buffer
