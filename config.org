@@ -10,6 +10,7 @@
   - [[#personal-info][Personal info]]
   - [[#default-settings][Default settings]]
   -  [[#doom-config][Doom Config]]
+  - [[#fixing-bugs][Fixing bugs]]
   - [[#other-stuff][Other stuff]]
 - [[#packages][Packages]]
   - [[#loading-instructions][Loading instructions]]
@@ -595,6 +596,13 @@ there are also a few other nice things I like
 (setq doom-modeline-enable-word-count t) ; super nice in visual mode
 (setq doom-modeline-persp-name t) ; I want to know where I am
  #+end_src
+** Fixing bugs
+
+in =mu= > 1.8 there is a problem with dooms default popup rules. Lets fix this
+#+begin_src emacs-lisp
+ (set-popup-rule! "^\\*mu4e-\\(main\\|headers\\)\\*" :ignore t)
+#+end_src
+
 
 
 
@@ -2249,6 +2257,7 @@ These be important
 #+begin_src emacs-lisp
 (setq mu4e-context-policy 'pick-first)
 (setq mu4e-compose-context-policy 'always-ask)
+(setq mu4e-compose-format-flowed t)
 (load! "private/email.el")
 #+end_src
 
@@ -2317,6 +2326,11 @@ We can also use this a signature,
 #+begin_src emacs-lisp
 (setq message-signature mu4e-from-name)
 #+end_src
+
+#+begin_src emacs-lisp
+(setq mu4e-compose-signature "David")
+#+end_src
+
 
 **** some visual improvements
 :PROPERTIES:
@@ -2494,7 +2508,7 @@ The ~@~ character indicates note with timestamp and ~!~ is just timestamp
            "WAIT(w@/!)"       ; Something external is holding up this task
            "HOLD(h)"       ; This task is paused/on hold because of me
            "IDEA(i)"       ; An unconfirmed and unapproved task or notion
-           "NEXT(n/!)"       ; Something to consider doing
+           "NEXT(n!)"       ; Something to consider doing
            "|"
            "DONE(d@)"       ; Task successfully completed
            "CANCELLED(k)") ; Task was cancelled, aborted or is no longer applicable
