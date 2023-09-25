@@ -2616,12 +2616,14 @@ just set where I want things to be
 (setq org-roam-directory "~/Roam")
 #+end_src
 
+I like having a keybinding for inserting org roam notes
 #+begin_src emacs-lisp
 (map! :map org-mode-map
       :after org
       "C-S-n" #'org-roam-node-insert)
 #+end_src
 
+**** Templates
 #+begin_src emacs-lisp
 
 
@@ -2634,6 +2636,30 @@ just set where I want things to be
                 :unnarrowed t  )
                 ))
 
+;; old templates to consider for future use
+;; (setq org-roam-capture-templates
+;;       '(("m" "main" plain
+;;          "%?"
+;;          :if-new (file+head "main/${slug}.org"
+;;                             "#+title: ${title}\n")
+;;          :immediate-finish t
+;;          :unnarrowed t)
+;;         ("r" "reference" plain "%?"
+;;          :if-new
+;;          (file+head "reference/${title}.org" "#+title: ${title}\n")
+;;          :immediate-finish t
+;;          :unnarrowed t)
+;;         ("a" "article" plain "%?"
+;;          :if-new
+;;          (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
+;;          :immediate-finish t
+;;          :unnarrowed t)))
+
+
+#+end_src
+**** Advanced configuration
+
+#+begin_src emacs-lisp
 (defun org-roam-node-insert-immediate (arg &rest args)
   (interactive "P")
   (let ((args (cons arg args))
@@ -2657,27 +2683,50 @@ just set where I want things to be
   (interactive)
   (setq org-agenda-files (da/org-roam-list-notes-by-tag "article")))
 
+(defun my/org-roam-capture-task ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Capture the new task, creating the project file if necessary
+  (org-roam-capture- :node (org-roam-node-read
+                            nil
+                            (my/org-roam-filter-by-tag "Project"))
+                     :templates '(("p" "project" plain "* TODO %?"
+                                   :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                          ("Tasks"))))))
+
 ;; Build the agenda list the first time for the session
 ;; (my/org-roam-refresh-agenda-list)
+(defun my/org-roam-copy-todo-to-today ()
+  (interactive)
+  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+        (org-roam-dailies-capture-templates
+          '(("t" "tasks" entry "%?"
+             :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+        (org-after-refile-insert-hook #'save-buffer)
+        today-file
+        pos)
+    (save-window-excursion
+      (org-roam-dailies--capture (current-time) t)
+      (setq today-file (buffer-file-name))
+      (setq pos (point)))
 
-;; old templates to consider for future use
-;; (setq org-roam-capture-templates
-;;       '(("m" "main" plain
-;;          "%?"
-;;          :if-new (file+head "main/${slug}.org"
-;;                             "#+title: ${title}\n")
-;;          :immediate-finish t
-;;          :unnarrowed t)
-;;         ("r" "reference" plain "%?"
-;;          :if-new
-;;          (file+head "reference/${title}.org" "#+title: ${title}\n")
-;;          :immediate-finish t
-;;          :unnarrowed t)
-;;         ("a" "article" plain "%?"
-;;          :if-new
-;;          (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
-;;          :immediate-finish t
-;;          :unnarrowed t)))
+    ;; Only refile if the target file is different than the current file
+    (unless (equal (file-truename today-file)
+                   (file-truename (buffer-file-name)))
+      (org-refile nil nil (list "Tasks" today-file nil pos)))))
+
+(add-to-list 'org-after-todo-state-change-hook
+             (lambda ()
+               (when (equal org-state "DONE")
+                 (my/org-roam-copy-todo-to-today))))
+#+end_src
+**** org-roam-ui
+
+a fantastic package for visualising my content and knowledge
+#+begin_src emacs-lisp
 (use-package! websocket
     :after org-roam)
 
@@ -2692,9 +2741,10 @@ just set where I want things to be
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
-
-
 #+end_src
+
+
+
 *** Jupyter notebook
 #+begin_src emacs-lisp
 
