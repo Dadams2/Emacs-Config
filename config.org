@@ -449,7 +449,7 @@ latex               ; writing papers in Emacs has never been so fun
 (python
  +lsp
  +pyright
- +conda
+ ;; +conda          ; micromamba is better :D
  +cython)           ; beautiful is better than ugly
 ;;qt                ; the 'cutest' gui framework ever
 ;;racket            ; a DSL for DSLs
@@ -2819,7 +2819,7 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 
 ;; fun with link inserts
 ;; todo make this get the window title and fix other stuff
-(defun insert-firefox-url ()
+(defun da/insert-firefox-url ()
   "Insert the URL of the currently open tab in Firefox."
   (interactive)
   (setq script-path (expand-file-name "get_firefox_url.sh" doom-private-dir))
@@ -2827,7 +2827,7 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
   (setq url (string-trim url)) ; Remove leading/trailing whitespace
   (insert (format "[[%s][%s]]" url url)))
 
-(defun refile-all-todo-headings ()
+(defun da/refile-all-todo-headings ()
   "Refile all TODO headings in the current Org mode buffer."
   (interactive)
   (org-map-entries
@@ -2871,10 +2871,13 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
  :recipe (:host github :repo "pft/mingus"))
 (unpin! org-roam)
 (package! org-roam-ui)
+(package! grab-x-link
+  :recipe (:host github :repo "xuchunyang/grab-x-link"))
 
 ;; (package! ibrowse
 ;;  :recipe (:host github :repo "nicolas-graves/ibrowse.el"))
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
+;; firefox --remote-debugging-port=9222
 ;(package! some-package)
 
 ;; To install a package directly from a remote git repo, you must specify a
