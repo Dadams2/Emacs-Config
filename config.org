@@ -477,7 +477,7 @@ A constant work in progress. But trying to understand it does teach you a bunch.
 
 #+name: doom-email
 #+begin_src emacs-lisp
-(:if (executable-find "mu") (mu4e +gmail))
+(:if (executable-find "mu") (mu4e +gmail +org))
 ;;notmuch
 ;;(wanderlust +gmail)
 #+end_src
