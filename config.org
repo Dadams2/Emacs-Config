@@ -1253,17 +1253,6 @@ automated commit templates seem nice to me
   )
 #+end_src
 
-TODO: handle automated setup
-I have yet to find something I want to change about magit. Maybe magit delta can be put to use.
-#+begin_src emacs-lisp
-
-(after! magit
-  (magit-delta-mode +1))
-
-; Fix dumb thing of magit not finding delta
-(after! magit-delta
-  (setq magit-delta-delta-executable "~/.cargo/bin/delta"))
-#+end_src
 
 
 Keymaps are a pain at the best of times and I couldn't get the normal maps to work
@@ -1325,7 +1314,6 @@ Having ~Ispell~ Enabled is really useful.
 Nothing to put here currently. Look into ~company-dabbrev-code~
 
 *** Projectile
-
 because it faster
 #+begin_src emacs-lisp
 (setq projectile-indexing-method 'native)
@@ -1337,133 +1325,133 @@ because it faster
 ;; (setq projectile-project-search-path '("~/Things/"))
 
 
-#+end_src
+ #+end_src
 *** Smerge
-The default keybindings are not the best really, and could use some improvement.
-Especially in keeping all changes.
-#+begin_src emacs-lisp
-(defun smerge-repeatedly ()
-  "Perform smerge actions again and again"
-  (interactive)
-  (smerge-mode 1)
-  (smerge-transient))
-(after! transient
-  (transient-define-prefix smerge-transient ()
-    [["Move"
-      ("n" "next" (lambda () (interactive) (ignore-errors (smerge-next)) (evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))
-      ("p" "previous" (lambda () (interactive) (ignore-errors (smerge-prev))(evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))]
-     ["Keep"
-      ("b" "base" (lambda () (interactive) (ignore-errors (smerge-keep-base)) (smerge-repeatedly)))
-      ("u" "upper" (lambda () (interactive) (ignore-errors (smerge-keep-upper)) (smerge-repeatedly)))
-      ("l" "lower" (lambda () (interactive) (ignore-errors (smerge-keep-lower)) (smerge-repeatedly)))
-      ("a" "all" (lambda () (interactive) (ignore-errors (smerge-keep-all)) (smerge-repeatedly)))
-      ("RET" "current" (lambda () (interactive) (ignore-errors (smerge-keep-current)) (smerge-repeatedly)))]
-     ["Diff"
-      ("<" "upper/base" (lambda () (interactive) (ignore-errors (smerge-diff-base-upper)) (smerge-repeatedly)))
-      ("=" "upper/lower" (lambda () (interactive) (ignore-errors (smerge-diff-upper-lower)) (smerge-repeatedly)))
-      (">" "base/lower" (lambda () (interactive) (ignore-errors (smerge-diff-base-lower)) (smerge-repeatedly)))
-      ("R" "refine" (lambda () (interactive) (ignore-errors (smerge-refine)) (smerge-repeatedly)))
-      ("E" "ediff" (lambda () (interactive) (ignore-errors (smerge-ediff)) (smerge-repeatedly)))]
-     ["Other"
-      ("c" "combine" (lambda () (interactive) (ignore-errors (smerge-combine-with-next)) (smerge-repeatedly)))
-      ("r" "resolve" (lambda () (interactive) (ignore-errors (smerge-resolve)) (smerge-repeatedly)))
-      ("k" "kill current" (lambda () (interactive) (ignore-errors (smerge-kill-current)) (smerge-repeatedly)))
-      ("q" "quit" (lambda () (interactive) (smerge-auto-leave)))]]))
-#+end_src
+ The default keybindings are not the best really, and could use some improvement.
+ Especially in keeping all changes.
+ #+begin_src emacs-lisp
+ (defun smerge-repeatedly ()
+   "Perform smerge actions again and again"
+   (interactive)
+   (smerge-mode 1)
+   (smerge-transient))
+ (after! transient
+   (transient-define-prefix smerge-transient ()
+     [["Move"
+       ("n" "next" (lambda () (interactive) (ignore-errors (smerge-next)) (evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))
+       ("p" "previous" (lambda () (interactive) (ignore-errors (smerge-prev))(evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))]
+      ["Keep"
+       ("b" "base" (lambda () (interactive) (ignore-errors (smerge-keep-base)) (smerge-repeatedly)))
+       ("u" "upper" (lambda () (interactive) (ignore-errors (smerge-keep-upper)) (smerge-repeatedly)))
+       ("l" "lower" (lambda () (interactive) (ignore-errors (smerge-keep-lower)) (smerge-repeatedly)))
+       ("a" "all" (lambda () (interactive) (ignore-errors (smerge-keep-all)) (smerge-repeatedly)))
+       ("RET" "current" (lambda () (interactive) (ignore-errors (smerge-keep-current)) (smerge-repeatedly)))]
+      ["Diff"
+       ("<" "upper/base" (lambda () (interactive) (ignore-errors (smerge-diff-base-upper)) (smerge-repeatedly)))
+       ("=" "upper/lower" (lambda () (interactive) (ignore-errors (smerge-diff-upper-lower)) (smerge-repeatedly)))
+       (">" "base/lower" (lambda () (interactive) (ignore-errors (smerge-diff-base-lower)) (smerge-repeatedly)))
+       ("R" "refine" (lambda () (interactive) (ignore-errors (smerge-refine)) (smerge-repeatedly)))
+       ("E" "ediff" (lambda () (interactive) (ignore-errors (smerge-ediff)) (smerge-repeatedly)))]
+      ["Other"
+       ("c" "combine" (lambda () (interactive) (ignore-errors (smerge-combine-with-next)) (smerge-repeatedly)))
+       ("r" "resolve" (lambda () (interactive) (ignore-errors (smerge-resolve)) (smerge-repeatedly)))
+       ("k" "kill current" (lambda () (interactive) (ignore-errors (smerge-kill-current)) (smerge-repeatedly)))
+       ("q" "quit" (lambda () (interactive) (smerge-auto-leave)))]]))
+ #+end_src
 
-Oh and I also want to bind this to a reasonable key.
-#+begin_src emacs-lisp
-(after! magit
-  (map! :leader
-        (:prefix-map ("g" . "git")
-         "m" 'smerge-repeatedly)))
-#+end_src
+ Oh and I also want to bind this to a reasonable key.
+ #+begin_src emacs-lisp
+ (after! magit
+   (map! :leader
+         (:prefix-map ("g" . "git")
+          "m" 'smerge-repeatedly)))
+ #+end_src
 
-*** Flycheck
+*** flyckeck
 
-because the default bindings are kinda dumb so everything is now =SPC c x=
-#+begin_src emacs-lisp
-(after! flycheck
-  (map! :leader
-        (:prefix-map ("c" . "code")
-         "x" flycheck-command-map)))
-#+end_src
+ because the default bindings are kinda dumb so everything is now =SPC c x=
+ #+begin_src emacs-lisp
+ (after! flycheck
+   (map! :leader
+         (:prefix-map ("c" . "code")
+          "x" flycheck-command-map)))
+ #+end_src
 
-*** Ispell
+ *** Ispell
 
-SCOWL provides a nice place to get dictionaries from I would like one:
+ SCOWL provides a nice place to get dictionaries from I would like one:
 
-- size
-    80 (huge)
-- spellings
-    British(-ise) and Australian
-- spelling variants level
-    0
-- diacritics
-    keep
-- extra lists
-    hacker, roman
+ - size
+     80 (huge)
+ - spellings
+     British(-ise) and Australian
+ - spelling variants level
+     0
+ - diacritics
+     keep
+ - extra lists
+     hacker, roman
 
 
-**** Aspell
+*** Aspell
 
-#+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
-cd /tmp
-curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
-tar -xjf "aspell6-en-custom.tar.bz2"
+ #+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
+ cd /tmp
+ curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
+ tar -xjf "aspell6-en-custom.tar.bz2"
 
-cd aspell6-en-custom
-./configure && make && sudo make install
-#+end_src
+ cd aspell6-en-custom
+ ./configure && make && sudo make install
+ #+end_src
 
 
 **** Configuration
 
-Actually set the correct spelling dictionary
-#+begin_src emacs-lisp
-(setq ispell-dictionary "en-custom")
-#+end_src
+ Actually set the correct spelling dictionary
+ #+begin_src emacs-lisp
+ (setq ispell-dictionary "en-custom")
+ #+end_src
 
-Also having a personal dictionary that is separate from the original is useful
+ Also having a personal dictionary that is separate from the original is useful
 
-#+begin_src emacs-lisp
-(setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
-#+end_src
+ #+begin_src emacs-lisp
+ (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
+ #+end_src
 
 
 *** YASnippet
 
-nested snippets are good so:
-#+begin_src emacs-lisp
-(setq yas-triggers-in-field t)
-#+end_src
+ nested snippets are good so:
+ #+begin_src emacs-lisp
+ (setq yas-triggers-in-field t)
+ #+end_src
 
 *** Dirvish
-A very nice extension to dired that seems significantly less buggy than =ranger.el=. However there are a few things we need to to keep things in check
-#+begin_src emacs-lisp
-;; (setq dirvish-mode-line-format ; it's ok to place string inside
-;;    '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
-;; (set-popup-rule! "^ \\*Dirvish.*" :ignore t)
+ A very nice extension to dired that seems significantly less buggy than =ranger.el=. However there are a few things we need to to keep things in check
+ #+begin_src emacs-lisp
+ ;; (setq dirvish-mode-line-format ; it's ok to place string inside
+ ;;    '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
+ ;; (set-popup-rule! "^ \\*Dirvish.*" :ignore t)
 
-;;   (map! :map dirvish-mode-map
-;;         :n "b" #'dirvish-goto-bookmark
-;;         :n "z" #'dirvish-show-history
-;;         :n "f" #'dirvish-file-info-menu
-;;         :n "F" #'dirvish-toggle-fullscreen
-;;         :n "l" #'dired-find-file
-;;         :n "h" #'dired-up-directory
-;;         :n "?" #'dirvish-dispatch
-;;         :n "q" #'quit-window
-;;         :localleader
-;;         "h" #'dired-omit-mode)
+ ;;   (map! :map dirvish-mode-map
+ ;;         :n "b" #'dirvish-goto-bookmark
+ ;;         :n "z" #'dirvish-show-history
+ ;;         :n "f" #'dirvish-file-info-menu
+ ;;         :n "F" #'dirvish-toggle-fullscreen
+ ;;         :n "l" #'dired-find-file
+ ;;         :n "h" #'dired-up-directory
+ ;;         :n "?" #'dirvish-dispatch
+ ;;         :n "q" #'quit-window
+ ;;         :localleader
+ ;;         "h" #'dired-omit-mode)
 
 
-;; (after! dirvish
-;;   (push '(collapse subtree-state) dirvish-attributes)
-;;   (setq dired-listing-switches
-;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
+ ;; (after! dirvish
+ ;;   (push '(collapse subtree-state) dirvish-attributes)
+ ;;   (setq dired-listing-switches
+ ;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
 
-#+end_src
+ #+end_src
 
 ** Visuals
 
@@ -1560,11 +1548,15 @@ TODO: add system installation for delta
 its currently not enabled as a module flag in doom so we need to do it ourself
 #+begin_src emacs-lisp
 (after! magit
-  (magit-delta-mode +1)
+  ;; (magit-delta-mode +1)
 (setq
     magit-delta-default-dark-theme "Nord"
     magit-delta-default-light-theme "OneHalfLight"
 ))
+
+; Fix dumb thing of magit not finding delta
+;; (after! magit-delta
+;;   (setq magit-delta-delta-executable "~/.cargo/bin/delta"))
 #+end_src
 
 *** Centaur Tabs
@@ -2378,8 +2370,6 @@ elfeed is great
 
 
 * Languages
-
-
 ** Org
 
 The beginning of a great journey
