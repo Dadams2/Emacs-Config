@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: down-right-arrow
+# uuid: down-right-arrow
+# key: dr
+# --
+↳$0

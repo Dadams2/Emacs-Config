@@ -103,7 +103,7 @@ Following in Tec's footsteps I somehow stumbled upon [[https://github.com/angryb
  truncate-string-ellipsis "…"                   ; is nicer
  password-cache-expiry nil
  compilation-scroll-output t                    ; warnings annoy me
-)
+ )
 
 (unless (string-match-p "^Power N/A" (battery)) ; On laptops...
   (display-battery-mode 1))                     ; it's nice to know how much power you have
@@ -163,20 +163,20 @@ TODO: consider a better face for it
 *** Embark for window switching
 #+begin_src emacs-lisp
 (after! embark
-    (eval-when-compile
+  (eval-when-compile
     (defmacro my/embark-ace-action (fn)
-        `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
-        (interactive)
-        (with-demoted-errors "%s"
-            (require 'ace-window)
-            (let ((aw-dispatch-always t))
-            (aw-switch-to-window (aw-select nil))
-            (call-interactively (symbol-function ',fn)))))))
+      `(defun ,(intern (concat "my/embark-ace-" (symbol-name fn))) ()
+         (interactive)
+         (with-demoted-errors "%s"
+           (require 'ace-window)
+           (let ((aw-dispatch-always t))
+             (aw-switch-to-window (aw-select nil))
+             (call-interactively (symbol-function ',fn)))))))
 
-    (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
-    (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
-    (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
-)
+  (define-key embark-file-map     (kbd "o") (my/embark-ace-action find-file))
+  (define-key embark-buffer-map   (kbd "o") (my/embark-ace-action switch-to-buffer))
+  (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
+  )
 #+end_src
 
 **  Doom Config
@@ -241,7 +241,7 @@ and that's it. There are also extra features that can be added to some of the mo
 
         :config
         <<doom-config>>
-) ;lol don't forget this closing brace like I did
+        ) ;lol don't forget this closing brace like I did
 #+end_src
 
 **** Config's config
@@ -327,7 +327,7 @@ vc                     ; version-control and Emacs, sitting in a tree
 **** Terminals
 
 whilst vterm is the best terminal emulator inside emacs currently, it is the most painful thing to compile (with
-the exception of maybe pdftools). As such having alternatives can be useful
+                                                                                                            the exception of maybe pdftools). As such having alternatives can be useful
 
 #+name: doom-term
 #+begin_src emacs-lisp
@@ -365,7 +365,7 @@ editorconfig    ; let someone else argue about tabs vs spaces
 (eval +overlay) ; run code, run (also, repls)
 ;;gist          ; interacting with github gists
 lookup          ; navigate your code and its documentation
-lsp             ; M-x vscode
+(lsp +elgot)    ; M-x vscode
 ;;macos         ; MacOS-specific commands
 (magit +forge)  ; a git porcelain for Emacs
 make            ; run make tasks from Emacs
@@ -519,7 +519,7 @@ I am a big fan of 'Fira Code'. Font sizes do need some fiddling to get it all ri
       )
 #+end_src
 
-***** Missing Fonts
+*jlhjjjah**** Missing Fonts
 
 Warning about missing fonts is a bit of a problem especially if you are coming to a new system.
 The following code (once again shamelessly ripped from Tec) makes it slightly more nice.
@@ -565,7 +565,7 @@ The following code (once again shamelessly ripped from Tec) makes it slightly mo
 Some icons such as       (should see a windows icon, up down arrows a clock and a calendar not rain clouds a rain drop or stars) can appear to be incorrect depending on what font doom uses for unicode rendering.
 This can make things difficult if you are working on something that renders them differently.
 #+begin_src emacs-lisp
-    (setq doom-unicode-font (font-spec :family "Fira Code Nerd Font"))
+(setq doom-unicode-font (font-spec :family "Fira Code Nerd Font"))
 #+end_src
 
 **** Theme and modeline
@@ -578,29 +578,29 @@ but overall its nice.
 #+end_src
 
 I use linux on all my systems so I don't need to be told that =LF UTF-8= is my file encoding all the time
- #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (defun doom-modeline-conditional-buffer-encoding ()
-"We expect the encoding to be LF UTF-8, so only show the modeline when this is not the case"
-(setq-local doom-modeline-buffer-encoding
-(unless (and (memq (plist-get (coding-system-plist buffer-file-coding-system) :category)
-                    '(coding-category-undecided coding-category-utf-8))
-            (not (memq (coding-system-eol-type buffer-file-coding-system) '(1 2))))
-t)))
+  "We expect the encoding to be LF UTF-8, so only show the modeline when this is not the case"
+  (setq-local doom-modeline-buffer-encoding
+              (unless (and (memq (plist-get (coding-system-plist buffer-file-coding-system) :category)
+                                 '(coding-category-undecided coding-category-utf-8))
+                           (not (memq (coding-system-eol-type buffer-file-coding-system) '(1 2))))
+                t)))
 
 (add-hook 'after-change-major-mode-hook #'doom-modeline-conditional-buffer-encoding)
- #+end_src
+#+end_src
 
 there are also a few other nice things I like
- #+begin_src elisp
+#+begin_src elisp
 (setq doom-modeline-minor-modes nil)
 (setq doom-modeline-enable-word-count t) ; super nice in visual mode
 (setq doom-modeline-persp-name t) ; I want to know where I am
- #+end_src
+#+end_src
 ** Fixing bugs
 
 in =mu= > 1.8 there is a problem with dooms default popup rules. Lets fix this
 #+begin_src emacs-lisp
- (set-popup-rule! "^\\*mu4e-\\(main\\|headers\\)\\*" :ignore t)
+(set-popup-rule! "^\\*mu4e-\\(main\\|headers\\)\\*" :ignore t)
 #+end_src
 
 
@@ -641,15 +641,15 @@ I like having access to bookmarks so lets save them in sane places and have a ke
 (setq bookmark-default-file "~/.doom.d/bookmarks") ; I like being able to store my bookmarks properly
 
 (map! :leader
-    (:prefix-map ("b" . "buffer")
-        "C-s" 'bookmark-save))
+      (:prefix-map ("b" . "buffer")
+                   "C-s" 'bookmark-save))
 #+end_src
 *** Buffer names
 
 Why not take advantage of icons for the default buffer
 #+begin_src emacs-lisp
 (setq doom-fallback-buffer-name "► Doom"
-+doom-dashboard-name "► Doom")
+      +doom-dashboard-name "► Doom")
 
 #+end_src
 
@@ -677,12 +677,12 @@ At the moment it is simple but I have bigger plans
         (:height 200 :min-height 30 :padding (1 . 2) :template ,(expand-file-name "misc/splash-images/blackhole-lines-5.svg" doom-private-dir))
         (:height 100 :min-height 24 :padding (1 . 2) :template ,(expand-file-name "misc/splash-images/emacs-e-template.svg" doom-private-dir))
         (:height 0   :min-height 0  :padding (0 . 0) :file ,fancy-splash-image-nil)))
-        ;; "list of plists with the following properties
-        ;; :height the height of the image
-        ;; :min-height minimum `frame-height' for image
-        ;; :padding `+doom-dashboard-banner-padding' to apply
-        ;; :template non-default template file
-        ;; :file file to use instead of template")
+;; "list of plists with the following properties
+;; :height the height of the image
+;; :min-height minimum `frame-height' for image
+;; :padding `+doom-dashboard-banner-padding' to apply
+;; :template non-default template file
+;; :file file to use instead of template")
 
 (defvar fancy-splash-template-colours
   '(("$colour1" . keywords) ("$colour2" . type) ("$colour3" . warning) ("$colour4" . base8))
@@ -873,18 +873,18 @@ stdin_mode=""
 args=()
 
 while :; do
-    case "$1" in
-        -t | -nw | --tty)
-            force_tty=true
-            shift ;;
-        -w | --wait)
-            force_wait=true
-            shift ;;
-        -m | --mode)
-            stdin_mode=" ($2-mode)"
-            shift 2 ;;
-        -h | --help)
-            echo -e "\033[1mUsage: e [-t] [-m MODE] [OPTIONS] FILE [-]\033[0m
+case "$1" in
+-t | -nw | --tty)
+force_tty=true
+shift ;;
+-w | --wait)
+force_wait=true
+shift ;;
+-m | --mode)
+stdin_mode=" ($2-mode)"
+shift 2 ;;
+-h | --help)
+echo -e "\033[1mUsage: e [-t] [-m MODE] [OPTIONS] FILE [-]\033[0m
 
 Emacs client convenience wrapper.
 
@@ -896,41 +896,41 @@ Emacs client convenience wrapper.
 \033[0;34m-m MODE, --mode MODE\033[0m  Mode to open \033[0;33mstdin\033[0m with
 
 Run \033[0;32memacsclient --help\033[0m to see help for the emacsclient."
-            exit 0 ;;
-        --*=*)
-            set -- "$@" "${1%%=*}" "${1#*=}"
-            shift ;;
-        ,*)
-            if [ "$#" = 0 ]; then
-                break; fi
-            args+=("$1")
-            shift ;;
-    esac
+exit 0 ;;
+--*=*)
+set -- "$@" "${1%%=*}" "${1#*=}"
+shift ;;
+,*)
+if [ "$#" = 0 ]; then
+break; fi
+args+=("$1")
+shift ;;
+esac
 done
 
 if [ ! "${#args[*]}" = 0 ] && [ "${args[-1]}" = "-" ]; then
-    unset 'args[-1]'
-    TMP="$(mktemp /tmp/emacsstdin-XXX)"
-    cat > "$TMP"
-    args+=(--eval "(let ((b (generate-new-buffer \"*stdin*\"))) (switch-to-buffer b) (insert-file-contents \"$TMP\") (delete-file \"$TMP\")${stdin_mode})")
+unset 'args[-1]'
+TMP="$(mktemp /tmp/emacsstdin-XXX)"
+cat > "$TMP"
+args+=(--eval "(let ((b (generate-new-buffer \"*stdin*\"))) (switch-to-buffer b) (insert-file-contents \"$TMP\") (delete-file \"$TMP\")${stdin_mode})")
 fi
 
 if [ -z "$DISPLAY" ] || $force_tty; then
-    # detect terminals with sneaky 24-bit support
-    if { [ "$COLORTERM" = truecolor ] || [ "$COLORTERM" = 24bit ]; } \
-        && [ "$(tput colors 2>/dev/null)" -lt 257 ]; then
-        if echo "$TERM" | grep -q "^\w\+-[0-9]"; then
-            termstub="${TERM%%-*}"; else
-            termstub="${TERM#*-}"; fi
-        if infocmp "$termstub-direct" >/dev/null 2>&1; then
-            TERM="$termstub-direct"; else
-            TERM="xterm-direct"; fi # should be fairly safe
-    fi
-    emacsclient --tty -create-frame --alternate-editor="$ALTERNATE_EDITOR" "${args[@]}"
+# detect terminals with sneaky 24-bit support
+if { [ "$COLORTERM" = truecolor ] || [ "$COLORTERM" = 24bit ]; } \
+&& [ "$(tput colors 2>/dev/null)" -lt 257 ]; then
+if echo "$TERM" | grep -q "^\w\+-[0-9]"; then
+termstub="${TERM%%-*}"; else
+termstub="${TERM#*-}"; fi
+if infocmp "$termstub-direct" >/dev/null 2>&1; then
+TERM="$termstub-direct"; else
+TERM="xterm-direct"; fi # should be fairly safe
+fi
+emacsclient --tty -create-frame --alternate-editor="$ALTERNATE_EDITOR" "${args[@]}"
 else
-    if ! $force_wait; then
-        args+=(--no-wait); fi
-    emacsclient -create-frame --alternate-editor="$ALTERNATE_EDITOR" "${args[@]}"
+if ! $force_wait; then
+args+=(--no-wait); fi
+emacsclient -create-frame --alternate-editor="$ALTERNATE_EDITOR" "${args[@]}"
 fi
 #+end_src
 
@@ -1079,9 +1079,9 @@ I like to use tmux inside vterm and use vim bindings for navigating panes and wi
 This simply disables the global =C-h= for help.
 #+begin_src emacs-lisp
 (map! :after vterm
-        :map vterm-mode-map
-        "C-a" #'vterm-send-C-a
-        "C-h" #'vterm-send-C-h)
+      :map vterm-mode-map
+      "C-a" #'vterm-send-C-a
+      "C-h" #'vterm-send-C-h)
 #+end_src
 
 ** Tools
@@ -1115,9 +1115,9 @@ Now, there are one or two tweaks worth applying to VLF. For starters, it goes to
 the liberty of advising ~abort-if-file-too-large~, and in doing so removes the
 option of opening files literally. I think that's a bit much, so we can remove
 the advice and instead override ~files--ask-user-about-large-file~ (the more
-appropriate function, I think) as a simpler approach, just sacrificing the
+                                                                     appropriate function, I think) as a simpler approach, just sacrificing the
 original behaviour with src_elisp{(setq vlf-application 'always)} (which I can't
-imagine using anyway).
+                                                                         imagine using anyway).
 
 #+name: vlf-largefile-prompt
 #+begin_src emacs-lisp :noweb-ref none
@@ -1206,7 +1206,7 @@ Unfortunately, since evil-search doesn't have an analogue to
 *** Eros
 
 #+begin_quote
- =:tools eval=
+=:tools eval=
 #+end_quote
 
 Provides amazing inline evaluation of ~elisp~ using =gr= and =gR=.
@@ -1246,10 +1246,10 @@ automated commit templates seem nice to me
       (goto-char (point-min))
       (end-of-line)))
   (add-hook 'git-commit-setup-hook #'+magit-fill-in-commit-template 90)
-                )
+  )
 
 (after! magit
-(add-to-list '+magit-project-commit-templates-alist (cons "first" (lambda () (insert (magit-get-current-branch) ": "))))
+  (add-to-list '+magit-project-commit-templates-alist (cons "first" (lambda () (insert (magit-get-current-branch) ": "))))
   )
 #+end_src
 
@@ -1258,12 +1258,12 @@ automated commit templates seem nice to me
 Keymaps are a pain at the best of times and I couldn't get the normal maps to work
 #+begin_src emacs-lisp
 (after! evil-collection-magit
-(evil-collection-define-key 'normal
-  'evil-collection-magit-toggle-text-minor-mode-map
-  "\C-t" '+workspace/new)
-(evil-collection-define-key evil-collection-magit-state 'magit-mode-map
-  "\C-t" '+workspace/new)
-)
+  (evil-collection-define-key 'normal
+    'evil-collection-magit-toggle-text-minor-mode-map
+    "\C-t" '+workspace/new)
+  (evil-collection-define-key evil-collection-magit-state 'magit-mode-map
+    "\C-t" '+workspace/new)
+  )
 #+end_src
 
 *** Company
@@ -1276,8 +1276,8 @@ the thing that is most likely going to slow down my typing experience.
   (setq company-idle-delay 0.5
         company-minimum-prefix-length 3
         company-show-numbers t))
-  ;; (add-hook
-  ;;  'evil-normal-state-entry-hook #'company-abort))
+;; (add-hook
+;;  'evil-normal-state-entry-hook #'company-abort))
 #+end_src
 
 Also a good idea to improve memory:
@@ -1325,133 +1325,133 @@ because it faster
 ;; (setq projectile-project-search-path '("~/Things/"))
 
 
- #+end_src
+#+end_src
 *** Smerge
- The default keybindings are not the best really, and could use some improvement.
- Especially in keeping all changes.
- #+begin_src emacs-lisp
- (defun smerge-repeatedly ()
-   "Perform smerge actions again and again"
-   (interactive)
-   (smerge-mode 1)
-   (smerge-transient))
- (after! transient
-   (transient-define-prefix smerge-transient ()
-     [["Move"
-       ("n" "next" (lambda () (interactive) (ignore-errors (smerge-next)) (evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))
-       ("p" "previous" (lambda () (interactive) (ignore-errors (smerge-prev))(evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))]
-      ["Keep"
-       ("b" "base" (lambda () (interactive) (ignore-errors (smerge-keep-base)) (smerge-repeatedly)))
-       ("u" "upper" (lambda () (interactive) (ignore-errors (smerge-keep-upper)) (smerge-repeatedly)))
-       ("l" "lower" (lambda () (interactive) (ignore-errors (smerge-keep-lower)) (smerge-repeatedly)))
-       ("a" "all" (lambda () (interactive) (ignore-errors (smerge-keep-all)) (smerge-repeatedly)))
-       ("RET" "current" (lambda () (interactive) (ignore-errors (smerge-keep-current)) (smerge-repeatedly)))]
-      ["Diff"
-       ("<" "upper/base" (lambda () (interactive) (ignore-errors (smerge-diff-base-upper)) (smerge-repeatedly)))
-       ("=" "upper/lower" (lambda () (interactive) (ignore-errors (smerge-diff-upper-lower)) (smerge-repeatedly)))
-       (">" "base/lower" (lambda () (interactive) (ignore-errors (smerge-diff-base-lower)) (smerge-repeatedly)))
-       ("R" "refine" (lambda () (interactive) (ignore-errors (smerge-refine)) (smerge-repeatedly)))
-       ("E" "ediff" (lambda () (interactive) (ignore-errors (smerge-ediff)) (smerge-repeatedly)))]
-      ["Other"
-       ("c" "combine" (lambda () (interactive) (ignore-errors (smerge-combine-with-next)) (smerge-repeatedly)))
-       ("r" "resolve" (lambda () (interactive) (ignore-errors (smerge-resolve)) (smerge-repeatedly)))
-       ("k" "kill current" (lambda () (interactive) (ignore-errors (smerge-kill-current)) (smerge-repeatedly)))
-       ("q" "quit" (lambda () (interactive) (smerge-auto-leave)))]]))
- #+end_src
+The default keybindings are not the best really, and could use some improvement.
+Especially in keeping all changes.
+#+begin_src emacs-lisp
+(defun smerge-repeatedly ()
+  "Perform smerge actions again and again"
+  (interactive)
+  (smerge-mode 1)
+  (smerge-transient))
+(after! transient
+  (transient-define-prefix smerge-transient ()
+    [["Move"
+      ("n" "next" (lambda () (interactive) (ignore-errors (smerge-next)) (evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))
+      ("p" "previous" (lambda () (interactive) (ignore-errors (smerge-prev))(evil-scroll-line-to-center (line-number-at-pos)) (smerge-repeatedly)))]
+     ["Keep"
+      ("b" "base" (lambda () (interactive) (ignore-errors (smerge-keep-base)) (smerge-repeatedly)))
+      ("u" "upper" (lambda () (interactive) (ignore-errors (smerge-keep-upper)) (smerge-repeatedly)))
+      ("l" "lower" (lambda () (interactive) (ignore-errors (smerge-keep-lower)) (smerge-repeatedly)))
+      ("a" "all" (lambda () (interactive) (ignore-errors (smerge-keep-all)) (smerge-repeatedly)))
+      ("RET" "current" (lambda () (interactive) (ignore-errors (smerge-keep-current)) (smerge-repeatedly)))]
+     ["Diff"
+      ("<" "upper/base" (lambda () (interactive) (ignore-errors (smerge-diff-base-upper)) (smerge-repeatedly)))
+      ("=" "upper/lower" (lambda () (interactive) (ignore-errors (smerge-diff-upper-lower)) (smerge-repeatedly)))
+      (">" "base/lower" (lambda () (interactive) (ignore-errors (smerge-diff-base-lower)) (smerge-repeatedly)))
+      ("R" "refine" (lambda () (interactive) (ignore-errors (smerge-refine)) (smerge-repeatedly)))
+      ("E" "ediff" (lambda () (interactive) (ignore-errors (smerge-ediff)) (smerge-repeatedly)))]
+     ["Other"
+      ("c" "combine" (lambda () (interactive) (ignore-errors (smerge-combine-with-next)) (smerge-repeatedly)))
+      ("r" "resolve" (lambda () (interactive) (ignore-errors (smerge-resolve)) (smerge-repeatedly)))
+      ("k" "kill current" (lambda () (interactive) (ignore-errors (smerge-kill-current)) (smerge-repeatedly)))
+      ("q" "quit" (lambda () (interactive) (smerge-auto-leave)))]]))
+#+end_src
 
- Oh and I also want to bind this to a reasonable key.
- #+begin_src emacs-lisp
- (after! magit
-   (map! :leader
-         (:prefix-map ("g" . "git")
-          "m" 'smerge-repeatedly)))
- #+end_src
+Oh and I also want to bind this to a reasonable key.
+#+begin_src emacs-lisp
+(after! magit
+  (map! :leader
+        (:prefix-map ("g" . "git")
+                     "m" 'smerge-repeatedly)))
+#+end_src
 
 *** flyckeck
 
- because the default bindings are kinda dumb so everything is now =SPC c x=
- #+begin_src emacs-lisp
- (after! flycheck
-   (map! :leader
-         (:prefix-map ("c" . "code")
-          "x" flycheck-command-map)))
- #+end_src
+because the default bindings are kinda dumb so everything is now =SPC c x=
+#+begin_src emacs-lisp
+(after! flycheck
+  (map! :leader
+        (:prefix-map ("c" . "code")
+                     "x" flycheck-command-map)))
+#+end_src
 
- *** Ispell
+*** Ispell
 
- SCOWL provides a nice place to get dictionaries from I would like one:
+SCOWL provides a nice place to get dictionaries from I would like one:
 
- - size
-     80 (huge)
- - spellings
-     British(-ise) and Australian
- - spelling variants level
-     0
- - diacritics
-     keep
- - extra lists
-     hacker, roman
+- size
+80 (huge)
+- spellings
+British(-ise) and Australian
+- spelling variants level
+0
+- diacritics
+keep
+- extra lists
+hacker, roman
 
 
 *** Aspell
 
- #+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
- cd /tmp
- curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
- tar -xjf "aspell6-en-custom.tar.bz2"
+#+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
+cd /tmp
+curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=80&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
+tar -xjf "aspell6-en-custom.tar.bz2"
 
- cd aspell6-en-custom
- ./configure && make && sudo make install
- #+end_src
+cd aspell6-en-custom
+./configure && make && sudo make install
+#+end_src
 
 
 **** Configuration
 
- Actually set the correct spelling dictionary
- #+begin_src emacs-lisp
- (setq ispell-dictionary "en-custom")
- #+end_src
+Actually set the correct spelling dictionary
+#+begin_src emacs-lisp
+(setq ispell-dictionary "en-custom")
+#+end_src
 
- Also having a personal dictionary that is separate from the original is useful
+Also having a personal dictionary that is separate from the original is useful
 
- #+begin_src emacs-lisp
- (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
- #+end_src
+#+begin_src emacs-lisp
+(setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
+#+end_src
 
 
 *** YASnippet
 
- nested snippets are good so:
- #+begin_src emacs-lisp
- (setq yas-triggers-in-field t)
- #+end_src
+nested snippets are good so:
+#+begin_src emacs-lisp
+(setq yas-triggers-in-field t)
+#+end_src
 
 *** Dirvish
- A very nice extension to dired that seems significantly less buggy than =ranger.el=. However there are a few things we need to to keep things in check
- #+begin_src emacs-lisp
- ;; (setq dirvish-mode-line-format ; it's ok to place string inside
- ;;    '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
- ;; (set-popup-rule! "^ \\*Dirvish.*" :ignore t)
+A very nice extension to dired that seems significantly less buggy than =ranger.el=. However there are a few things we need to to keep things in check
+#+begin_src emacs-lisp
+;; (setq dirvish-mode-line-format ; it's ok to place string inside
+;;    '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
+;; (set-popup-rule! "^ \\*Dirvish.*" :ignore t)
 
- ;;   (map! :map dirvish-mode-map
- ;;         :n "b" #'dirvish-goto-bookmark
- ;;         :n "z" #'dirvish-show-history
- ;;         :n "f" #'dirvish-file-info-menu
- ;;         :n "F" #'dirvish-toggle-fullscreen
- ;;         :n "l" #'dired-find-file
- ;;         :n "h" #'dired-up-directory
- ;;         :n "?" #'dirvish-dispatch
- ;;         :n "q" #'quit-window
- ;;         :localleader
- ;;         "h" #'dired-omit-mode)
+;;   (map! :map dirvish-mode-map
+;;         :n "b" #'dirvish-goto-bookmark
+;;         :n "z" #'dirvish-show-history
+;;         :n "f" #'dirvish-file-info-menu
+;;         :n "F" #'dirvish-toggle-fullscreen
+;;         :n "l" #'dired-find-file
+;;         :n "h" #'dired-up-directory
+;;         :n "?" #'dirvish-dispatch
+;;         :n "q" #'quit-window
+;;         :localleader
+;;         "h" #'dired-omit-mode)
 
 
- ;; (after! dirvish
- ;;   (push '(collapse subtree-state) dirvish-attributes)
- ;;   (setq dired-listing-switches
- ;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
+;; (after! dirvish
+;;   (push '(collapse subtree-state) dirvish-attributes)
+;;   (setq dired-listing-switches
+;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
 
- #+end_src
+#+end_src
 
 ** Visuals
 
@@ -1549,12 +1549,12 @@ its currently not enabled as a module flag in doom so we need to do it ourself
 #+begin_src emacs-lisp
 (after! magit
   ;; (magit-delta-mode +1)
-(setq
-    magit-delta-default-dark-theme "Nord"
-    magit-delta-default-light-theme "OneHalfLight"
-))
+  (setq
+   magit-delta-default-dark-theme "Nord"
+   magit-delta-default-light-theme "OneHalfLight"
+   ))
 
-; Fix dumb thing of magit not finding delta
+                                        ; Fix dumb thing of magit not finding delta
 ;; (after! magit-delta
 ;;   (setq magit-delta-delta-executable "~/.cargo/bin/delta"))
 #+end_src
@@ -1648,26 +1648,27 @@ Prevents a series of redisplays from being called (when set to an appropriate va
 
 When run without flags this will perform the following actions
 + Read, and parse [[file:~/.mbsyncrc][~/.mbsyncrc]], specifically recognising the following properties
-  - ~IMAPAccount~
-  - ~Host~
-  - ~Port~
-  - ~User~
-  - ~Password~
-  - ~PassCmd~
-  - ~Patterns~
+- ~IMAPAccount~
+- ~Host~
+- ~Port~
+- ~User~
+- ~Password~
+- ~PassCmd~
+- ~Patterns~
 + Call ~mbsync --list ACCOUNT~, and filter results according to ~Patterns~
 + Construct a imapnotify config for each account, with the following hooks
-  - onNewMail :: src_shell{mbsync --pull ACCOUNT:MAILBOX}
-  - onNewMailPost :: src_shell{if mu index --lazy-check; then test -f /tmp/mu_reindex_now && rm /tmp/mu_reindex_now; else touch /tmp/mu_reindex_now; fi}
+- onNewMail :: src_shell{mbsync --pull ACCOUNT:MAILBOX}
+- onNewMailPost :: src_shell{if mu index --lazy-check; then test -f /tmp/mu_reindex_now && rm /tmp/mu_reindex_now; else touch /tmp/mu_reindex_now; fi}
 + Compare accounts list to previous accounts, enable/disable the relevant
-  systemd services, called with the ~--now~ flag (start/stop services as well)
+systemd services, called with the ~--now~ flag (start/stop services as well)
 
 This script also supports the following flags
 + ~--status~ to get the status of the relevant systemd services supports =active=,
-  =failing=, and =disabled=
+=failing=, and =disabled=
 + ~--enable~ to enable all relevant systemd services
 + ~--disable~ to disable all relevant systemd services
 #+begin_src python :tangle misc/mbsync-imapnotify.py :shebang "#!/usr/bin/env python3"
+#!/usr/bin/env python3
 from pathlib import Path
 import json
 import re
@@ -2050,11 +2051,13 @@ msmtpDefaults = {
     "auth": "on",
     "tls": "on",
     "tls_trust_file": "/etc/ssl/certs/ca-certificates.crt",
-    "logfile" :"~/.msmtp.log",
+    "logfile": "~/.msmtp.log",
 }
 
+
 def export_defaults(defaults):
-    return "\n".join(f"{field:<20}{value}" for field,value in msmtpDefaults.items())
+    return "\n".join(f"{field:<20}{value}" for field, value in msmtpDefaults.items())
+
 
 @dataclass(init=False)
 class MsmtpAccount:
@@ -2066,36 +2069,41 @@ class MsmtpAccount:
     password_expression: str = ""
 
     def export(self):
-        return "\n".join([f"{field_map[field]:<20}{value}" for field,value in asdict(self).items()])
+        return "\n".join(
+            [f"{field_map[field]:<20}{value}" for field, value in asdict(self).items()]
+        )
 
 
 accounts: List[MsmtpAccount] = []
+
 
 def parse_mbsync_file():
     cur = None
     with open(mbsyncFile, "r") as f:
         for line in f:
-            if(line.startswith("IMAPAccount")):
-                accounts.append(cur)
-                cur= MsmtpAccount()
+            if line.startswith("IMAPAccount"):
+                cur = MsmtpAccount()
                 cur.name = line.strip().split()[1]
                 cur.port = default_port
-            if(line.startswith("Host")):
+            if line.startswith("Host"):
                 cur.host = line.strip().split()[1].replace("imap", "smtp")
-            if(line.startswith("User")):
+            if line.startswith("User"):
                 cur.from_address = line.strip().split()[1]
                 cur.user = cur.from_address.split("@")[0]
-            if(line.startswith("PassCmd")):
+            if line.startswith("PassCmd"):
                 cur.password_expression = " ".join(line.strip().split()[1:])
-    accounts.append(cur)
+                accounts.append(cur)
+
 
 def write_file():
     with open(msmtpFile, "w") as f:
-        f.write(export_defaults(msmtpDefaults)+"\n\n")
+        f.write(export_defaults(msmtpDefaults) + "\n\n")
         for acct in accounts:
-            if(acct != None):
-                f.write(acct.export()+"\n\n")
-        f.write(f"account default : {accounts[1].name}")
+            if acct != None:
+                print(acct.name)
+                f.write(acct.export() + "\n\n")
+        f.write(f"account default : {accounts[0].name}")
+
 
 def main():
     print("\033[1;34m:: MbSync to msmtp config file creator ::\033[0;37m")
@@ -2110,7 +2118,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 #+end_src
 **** Systemd Services
 A template service file so we can enable a unit per-account.
@@ -2231,10 +2238,10 @@ few more visual tweaks, we'll tweak the headers a bit
 (appendq! mu4e-header-info-custom
           '((:folder .
              (:name "Folder" :shortname "Folder" :help "Lowest level folder" :function
-              (lambda (msg)
-                (+mu4e-colorize-str
-                 (replace-regexp-in-string "\\`.*/" "" (mu4e-message-field msg :maildir))
-                 '+mu4e-header--folder-colors))))))
+                    (lambda (msg)
+                      (+mu4e-colorize-str
+                       (replace-regexp-in-string "\\`.*/" "" (mu4e-message-field msg :maildir))
+                       '+mu4e-header--folder-colors))))))
 #+end_src
 We'll also use a nicer alert icon or not
 #+begin_src emacs-lisp
@@ -2331,24 +2338,24 @@ We can also use this a signature,
 
 just makes the icons slightly better for unicode fonts
 #+begin_src emacs-lisp
-  (cl-flet* ((make-help-button (text help-echo)
-                               (with-temp-buffer
-                                 (insert-text-button text
-                                                     'help-echo help-echo
-                                                     'mouse-face nil)
-                                 (buffer-string)))
-             (make-help-button-cons (text1 text2 help-echo)
-                                    (cons (make-help-button text1 help-echo)
-                                          (make-help-button text2 help-echo))))
-    (setq mu4e-headers-threaded-label
-          (make-help-button-cons "T" (concat " " (all-the-icons-octicon "git-branch" :v-adjust 0.05))
-                                 "Thread view")
-          mu4e-headers-related-label
-          (make-help-button-cons "R" (concat " " (all-the-icons-material "link" :v-adjust -0.1))
-                                 "Showing related emails")
-          mu4e-headers-full-label
-          (make-help-button-cons "F" (concat " " (all-the-icons-material "disc_full"))
-                                 "Search is full!")))
+(cl-flet* ((make-help-button (text help-echo)
+             (with-temp-buffer
+               (insert-text-button text
+                                   'help-echo help-echo
+                                   'mouse-face nil)
+               (buffer-string)))
+           (make-help-button-cons (text1 text2 help-echo)
+             (cons (make-help-button text1 help-echo)
+                   (make-help-button text2 help-echo))))
+  (setq mu4e-headers-threaded-label
+        (make-help-button-cons "T" (concat " " (all-the-icons-octicon "git-branch" :v-adjust 0.05))
+                               "Thread view")
+        mu4e-headers-related-label
+        (make-help-button-cons "R" (concat " " (all-the-icons-material "link" :v-adjust -0.1))
+                               "Showing related emails")
+        mu4e-headers-full-label
+        (make-help-button-cons "F" (concat " " (all-the-icons-material "disc_full"))
+                               "Search is full!")))
 #+end_src
 
 *** Notifications
@@ -2356,7 +2363,7 @@ the main version of mu4e alert is kinda broken which is a shame. Need to keep an
 eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Untill then at least this fork is *slightly* less broken
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! mu4e-alert
- :recipe (:host github :repo "xzz53/mu4e-alert"))
+  :recipe (:host github :repo "xzz53/mu4e-alert"))
 #+end_src
 ** RSS/Newsfeed Reader
 
@@ -2365,7 +2372,7 @@ elfeed is great
 (after! elfeed
   (map! :leader
         (:prefix-map ("o" . "open")
-         "l" #'elfeed)))
+                     "l" #'elfeed)))
 #+end_src
 
 
@@ -2377,7 +2384,7 @@ The beginning of a great journey
 #+begin_src elisp :noweb no-export :noweb-prefix no 
 (after! org
   <<org-conf>>
-)
+  )
 #+end_src
 
 *** Basic configuration
@@ -2386,7 +2393,9 @@ The beginning of a great journey
 (setq +org-capture-todo-file (da/sub-work "~/Org/todo.org" "~/Org/work/todo.org"))
 (setq org-agenda-files '("~/Org/experiments.org"
                          "~/Org/mylife.org"
-                         "~/Org/birthday.org"))
+                         "~/Org/birthday.org"
+                         "~/Org/longrunning.org"
+                         "~/Org/Mail.org"))
 
 (setq org-return-follows-link t) ;; I like following links
 (setq org-use-speed-commands t) ;; gotta go fast
@@ -2394,6 +2403,7 @@ The beginning of a great journey
 (setq org-deadline-warning-days 30)
 (setq org-agenda-start-with-log-mode t)
 (setq org-log-done t)
+(setq org-log-refile 'time) ;; I refile a lot so don't want to be asked for notes
 (setq org-log-reschedule t)
 (setq org-agenda-restore-windows-after-quit t) ;; return me to buffers i want to go to
 (setq org-log-into-drawer t)
@@ -2402,29 +2412,39 @@ The beginning of a great journey
 (setq org-refile-allow-creating-parent-nodes t)
 (setq org-archive-location (da/sub-work "~/Org/Archive.org::datetree/* Finished Tasks " "~/Org/work/work_archive.org::datetree/ "))
 (setq org-clock-into-drawer "CLOCKING")
-  (setq org-refile-targets
-    '(("Archive.org" :maxlevel . 1)
-      ("mylife.org" :maxlevel . 1)
-      ("~/Org/work/todo.org" :maxlevel . 1)))
+(setq org-refile-targets
+      '(("Archive.org" :maxlevel . 1)
+        ("mylife.org" :maxlevel . 1)
+        ("longrunning.org" :maxlevel . 1)
+        ("~/Org/work/todo.org" :maxlevel . 1)))
 
-  ;; Save Org buffers after refiling!
-  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+(defun da/org-refile-all-todos ()
+  "Refile all TODO entries in the current org-mode file."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "TODO" nil t)
+      (org-refile))))
+;; Save Org buffers after refiling!
+;; (advice-add 'org-refile :after 'org-save-all-org-buffers)
 #+end_src
 *** Modules
 #+begin_src emacs-lisp
 (after! org
   (setq org-modules
-    '(;; ol-w3m
-      ;; ol-bbdb
-     ol-bibtex
-      ;; ol-docview
-      ;; ol-gnus
-      ;; ol-info
-      ;; ol-irc
-      ;; ol-mhe
-      ;; ol-rmail
-      ;; ol-eww
-      ))
+        '(;; ol-w3m
+          ;; ol-bbdb
+          ol-bibtex
+          org-habit
+          ;; ol-docview
+          ;; ol-gnus
+          ;; ol-info
+          ;; ol-irc
+          ;; ol-mhe
+          ;; ol-rmail
+          ;; ol-eww
+          ))
   )
 #+end_src
 
@@ -2435,52 +2455,52 @@ The beginning of a great journey
 
 **** Custom agenda commands
 #+begin_src emacs-lisp
-  (setq org-agenda-custom-commands
-   '(("d" "Dashboard"
-     ((agenda "" ((org-deadline-warning-days 7)))
-      (todo "NEXT"
-        ((org-agenda-overriding-header "Next Tasks")))
-      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+(setq org-agenda-custom-commands
+      '(("d" "Dashboard"
+         ((agenda "" ((org-deadline-warning-days 7)))
+          (todo "NEXT"
+                ((org-agenda-overriding-header "Next Tasks")))
+          (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
-    ("n" "Next Tasks"
-     ((todo "NEXT"
-        ((org-agenda-overriding-header "Next Tasks")))))
+        ("n" "Next Tasks"
+         ((todo "NEXT"
+                ((org-agenda-overriding-header "Next Tasks")))))
 
-    ("W" "Work Tasks" tags-todo "+work-email")
+        ("W" "Work Tasks" tags-todo "+work-email")
 
-    ;; Low-effort next actions
-    ("e" tags-todo "+TODO=\"TODO\"+Effort<15&+Effort>0"
-     ((org-agenda-overriding-header "Low Effort Tasks")
-      (org-agenda-max-todos 20)
-      (org-agenda-files org-agenda-files)))
+        ;; Low-effort next actions
+        ("e" tags-todo "+TODO=\"TODO\"+Effort<15&+Effort>0"
+         ((org-agenda-overriding-header "Low Effort Tasks")
+          (org-agenda-max-todos 20)
+          (org-agenda-files org-agenda-files)))
 
-    ("w" "Workflow Status"
-     ((todo "WAIT"
-            ((org-agenda-overriding-header "Waiting on External")
-             (org-agenda-files org-agenda-files)))
-      (todo "REVIEW"
-            ((org-agenda-overriding-header "In Review")
-             (org-agenda-files org-agenda-files)))
-      (todo "PLAN"
-            ((org-agenda-overriding-header "In Planning")
-             (org-agenda-todo-list-sublevels nil)
-             (org-agenda-files org-agenda-files)))
-      (todo "BACKLOG"
-            ((org-agenda-overriding-header "Project Backlog")
-             (org-agenda-todo-list-sublevels nil)
-             (org-agenda-files org-agenda-files)))
-      (todo "READY"
-            ((org-agenda-overriding-header "Ready for Work")
-             (org-agenda-files org-agenda-files)))
-      (todo "ACTIVE"
-            ((org-agenda-overriding-header "Active Projects")
-             (org-agenda-files org-agenda-files)))
-      (todo "COMPLETED"
-            ((org-agenda-overriding-header "Completed Projects")
-             (org-agenda-files org-agenda-files)))
-      (todo "CANC"
-            ((org-agenda-overriding-header "Cancelled Projects")
-             (org-agenda-files org-agenda-files)))))))
+        ("w" "Workflow Status"
+         ((todo "WAIT"
+                ((org-agenda-overriding-header "Waiting on External")
+                 (org-agenda-files org-agenda-files)))
+          (todo "REVIEW"
+                ((org-agenda-overriding-header "In Review")
+                 (org-agenda-files org-agenda-files)))
+          (todo "PLAN"
+                ((org-agenda-overriding-header "In Planning")
+                 (org-agenda-todo-list-sublevels nil)
+                 (org-agenda-files org-agenda-files)))
+          (todo "BACKLOG"
+                ((org-agenda-overriding-header "Project Backlog")
+                 (org-agenda-todo-list-sublevels nil)
+                 (org-agenda-files org-agenda-files)))
+          (todo "READY"
+                ((org-agenda-overriding-header "Ready for Work")
+                 (org-agenda-files org-agenda-files)))
+          (todo "ACTIVE"
+                ((org-agenda-overriding-header "Active Projects")
+                 (org-agenda-files org-agenda-files)))
+          (todo "COMPLETED"
+                ((org-agenda-overriding-header "Completed Projects")
+                 (org-agenda-files org-agenda-files)))
+          (todo "CANC"
+                ((org-agenda-overriding-header "Cancelled Projects")
+                 (org-agenda-files org-agenda-files)))))))
 
 #+end_src
 **** Todo Keywords
@@ -2489,126 +2509,164 @@ The ~@~ character indicates note with timestamp and ~!~ is just timestamp
 ~@/!~ note recorded when entering and timestamp when leaving
 #+begin_src emacs-lisp
 
-  (setq org-todo-keywords
-        '((sequence
-           "TODO(t!)"       ; A task that needs doing & is ready to do
-           "PROJ(p)"       ; A project, which usually contains other tasks
-           "LOOP(r)"       ; A recurring task
-           "STRT(s)"       ; A task that is in progress
-           "WAIT(w@/!)"       ; Something external is holding up this task
-           "HOLD(h)"       ; This task is paused/on hold because of me
-           "IDEA(i)"       ; An unconfirmed and unapproved task or notion
-           "NEXT(n!)"       ; Something to consider doing
-           "|"
-           "DONE(d@)"       ; Task successfully completed
-           "CANCELLED(k)") ; Task was cancelled, aborted or is no longer applicable
-          (sequence
-           "[ ](T)"        ; A task that needs doing
-           "[-](S)"        ; Task is in progress
-           "[?](W)"        ; Task is being held up or paused
-           "|"
-           "[X](D)"))      ; Task was completed
-          ;; (sequence
-          ;;  "|"
-          ;;  "OKAY(o)"
-          ;;  "YES(y)"
-          ;;  "NO(n)"))
-        org-todo-keyword-faces
-        '(("[-]"  . +org-todo-active)
-          ("STRT" . +org-todo-active)
-          ("[?]"  . +org-todo-onhold)
-          ("WAIT" . +org-todo-onhold)
-          ("HOLD" . +org-todo-onhold)
-          ("PROJ" . +org-todo-project)
-          ;; ("NO"   . +org-todo-cancel)
-          ("CANCELLED" . +org-todo-cancel)))
+(setq org-todo-keywords
+      '((sequence
+         "TODO(t!)"       ; A task that needs doing & is ready to do
+         "PROJ(p)"       ; A project, which usually contains other tasks
+         "LOOP(r)"       ; A recurring task
+         "STRT(s)"       ; A task that is in progress
+         "WAIT(w@/!)"       ; Something external is holding up this task
+         "HOLD(h)"       ; This task is paused/on hold because of me
+         "IDEA(i)"       ; An unconfirmed and unapproved task or notion
+         "NEXT(n!)"       ; Something to consider doing
+         "|"
+         "DONE(d@)"       ; Task successfully completed
+         "CANCELLED(k)"
+         ) ; Task was cancelled, aborted or is no longer applicable
+        (sequence
+         "[ ](T)"        ; A task that needs doing
+         "[-](S)"        ; Task is in progress
+         "[?](W)"        ; Task is being held up or paused
+         "|"
+         "[X](D)"))      ; Task was completed
+      ;; (sequence
+      ;;  "|"
+      ;;  "OKAY(o)"
+      ;;  "YES(y)"
+      ;;  "NO(n)"))
+      org-todo-keyword-faces
+      '(("[-]"  . +org-todo-active)
+        ("STRT" . +org-todo-active)
+        ("[?]"  . +org-todo-onhold)
+        ("WAIT" . +org-todo-onhold)
+        ("HOLD" . +org-todo-onhold)
+        ("PROJ" . +org-todo-project)
+        ;; ("NO"   . +org-todo-cancel)
+        ("CANCELLED" . +org-todo-cancel)))
 
 
-  (setq org-tag-alist
-    '((:startgroup)
-       ; Put mutually exclusive tags here
-       (:endgroup)
-       ("@errand" . ?E)
-       ("@home" . ?H)
-       ("@work" . ?W)
-       ("computer" . ?c)
-       ("agenda" . ?a)
-       ("planning" . ?p)
-       ("publish" . ?P)
-       ("batch" . ?b)
-       ("note" . ?n)
-       ("idea" . ?i)))
+(setq org-tag-alist
+      '((:startgroup)
+                                        ; Put mutually exclusive tags here
+        (:endgroup)
+        ("@errand" . ?E)
+        ("@home" . ?H)
+        ("@work" . ?W)
+        ("computer" . ?c)
+        ("agenda" . ?a)
+        ("planning" . ?p)
+        ("publish" . ?P)
+        ("batch" . ?b)
+        ("note" . ?n)
+        ("idea" . ?i)))
 #+end_src
 **** Capture Templates
 a straight rip of the doom config
 #+begin_src emacs-lisp
 (defvar my/org-contacts-template
-    (concat "* %(org-contacts-template-name)\n"
-            ":PROPERTIES:\n"
-            ":EMAIL: %^{EMAIL}\n"
-            ":NOTE: %^{NOTE}\n"
-            ":END:") "Template for a contact.")
+  (concat "* %(org-contacts-template-name)\n"
+          ":PROPERTIES:\n"
+          ":EMAIL: %^{EMAIL}\n"
+          ":NOTE: %^{NOTE}\n"
+          ":END:") "Template for a contact.")
 
 (setq org-capture-templates
-`(("t" "Personal todo" entry
-(file+headline +org-capture-todo-file "Inbox")
-"* TODO %?\n%i:LOGBOOK:\n- Added: %U\n:END:\n\n%a" :prepend t)
-("n" "Personal notes" entry
-(file+headline +org-capture-notes-file "Inbox")
-"* %u %?\n%i\n%a" :prepend t)
-("j" "Journal" entry
-(file+olp+datetree +org-capture-journal-file)
-"* %U %?\n%i\n%a" :prepend t)
+      `(("t" "Personal todo" entry
+         (file+headline +org-capture-todo-file "Inbox")
+         "* TODO %?\n%i:LOGBOOK:\n- Added: %U\n:END:\n\n%a" :prepend t)
+        ("n" "Personal notes" entry
+         (file+headline +org-capture-notes-file "Inbox")
+         "* %u %?\n%i\n%a" :prepend t)
+        ("j" "Journal" entry
+         (file+olp+datetree +org-capture-journal-file)
+         "* %U %?\n%i\n%a" :prepend t)
 
-("w" "Web Capture" entry
-(file+headline +org-capture-todo-file "Inbox")
-"* %?\n:LOGBOOK:\n- Added: %U\n:END:\n\n%i\n%a" :prepend t)
+        ("w" "Web Capture" entry
+         (file+headline +org-capture-todo-file "Inbox")
+         "* %?\n:LOGBOOK:\n- Added: %U\n:END:\n\n%i\n%a" :prepend t)
 
-;; Will use {project-root}/{todo,notes,changelog}.org, unless a
-;; {todo,notes,changelog}.org file is found in a parent directory.
-;; Uses the basename from `+org-capture-todo-file',
-;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
-("p" "Templates for projects")
-("pt" "Project-local todo" entry  ; {project-root}/todo.org
-(file+headline +org-capture-project-todo-file "Inbox")
-"* TODO %?\n%i\n%a" :prepend t)
-("pn" "Project-local notes" entry  ; {project-root}/notes.org
-(file+headline +org-capture-project-notes-file "Inbox")
-"* %U %?\n%i\n%a" :prepend t)
-("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
-(file+headline +org-capture-project-changelog-file "Unreleased")
-"* %U %?\n%i\n%a" :prepend t)
+        ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
+        ;; {todo,notes,changelog}.org file is found in a parent directory.
+        ;; Uses the basename from `+org-capture-todo-file',
+        ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
+        ("p" "Templates for projects")
+        ("pt" "Project-local todo" entry  ; {project-root}/todo.org
+         (file+headline +org-capture-project-todo-file "Inbox")
+         "* TODO %?\n%i\n%a" :prepend t)
+        ("pn" "Project-local notes" entry  ; {project-root}/notes.org
+         (file+headline +org-capture-project-notes-file "Inbox")
+         "* %U %?\n%i\n%a" :prepend t)
+        ("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
+         (file+headline +org-capture-project-changelog-file "Unreleased")
+         "* %U %?\n%i\n%a" :prepend t)
 
-("c" "Contact" entry (file+headline "~/Org/contacts.org" "Inbox"),
-      my/org-contacts-template
-      :empty-lines 1)
-;; Will use {org-directory}/{+org-capture-projects-file} and store
-;; these under {ProjectName}/{Tasks,Notes,Changelog} headings. They
-;; support `:parents' to specify what headings to put them under, e.g.
-;; :parents ("Projects")
-("o" "Centralized templates for projects")
-("ot" "Project todo" entry
-(function +org-capture-central-project-todo-file)
-"* TODO %?\n %i\n %a"
-:heading "Tasks"
-:prepend nil)
-("on" "Project notes" entry
-(function +org-capture-central-project-notes-file)
-"* %U %?\n %i\n %a"
-:heading "Notes"
-:prepend t)
-("oc" "Project changelog" entry
-(function +org-capture-central-project-changelog-file)
-"* %U %?\n %i\n %a"
-:heading "Changelog"
-:prepend t)))
+        ("c" "Contact" entry (file+headline "~/Org/contacts.org" "Inbox"),
+         my/org-contacts-template
+         :empty-lines 1)
+        ;; Will use {org-directory}/{+org-capture-projects-file} and store
+        ;; these under {ProjectName}/{Tasks,Notes,Changelog} headings. They
+        ;; support `:parents' to specify what headings to put them under, e.g.
+        ;; :parents ("Projects")
+        ("o" "Centralized templates for projects")
+        ("ot" "Project todo" entry
+         (function +org-capture-central-project-todo-file)
+         "* TODO %?\n %i\n %a"
+         :heading "Tasks"
+         :prepend nil)
+        ("on" "Project notes" entry
+         (function +org-capture-central-project-notes-file)
+         "* %U %?\n %i\n %a"
+         :heading "Notes"
+         :prepend t)
+        ("oc" "Project changelog" entry
+         (function +org-capture-central-project-changelog-file)
+         "* %U %?\n %i\n %a"
+         :heading "Changelog"
+         :prepend t)
+
+
+        ;; the +2d is the SLA for how long you want an email to be
+
+        ("m" "Email Workflow")
+        ("mf" "Follow Up" entry (file+olp "~/Org/Mail.org" "Follow Up")
+         "* TODO Follow up with %:fromname on %a\nSCHEDULED:%t\nDEADLINE: %(org-insert-time-stamp (org-read-date nil t \"+2d\"))\n\n%i")
+        ("mr" "Read Later" entry (file+olp "~/Org/Mail.org" "Read Later")
+         "* TODO Read %:subject\nSCHEDULED:%t\nDEADLINE: %(org-insert-time-stamp (org-read-date nil t \"+2d\"))\n\n%a\n\n%i" :immediate-finish t))
+      )
 #+end_src
+**** Mu4e Capture Templates
+[[*Mu4e][Mu4e]]
+#+begin_src emacs-lisp
+
+(defun efs/capture-mail-follow-up (msg)
+  (interactive)
+  (call-interactively 'org-store-link)
+  (org-capture nil "mf"))
+
+(defun efs/capture-mail-read-later (msg)
+  (interactive)
+  (call-interactively 'org-store-link)
+  (org-capture nil "mr"))
+
+;; Add custom actions for our capture templates
+(after! mu4e
+  (add-to-list 'mu4e-headers-actions
+               '("follow up" . efs/capture-mail-follow-up) t)
+  (add-to-list 'mu4e-view-actions
+               '("follow up" . efs/capture-mail-follow-up) t)
+  (add-to-list 'mu4e-headers-actions
+               '("read later" . efs/capture-mail-read-later) t)
+  (add-to-list 'mu4e-view-actions
+               '("read later" . efs/capture-mail-read-later) t)
+  )
+#+end_src
+
 **** latex interactions
 #+begin_src emacs-lisp
 (setq org-latex-packages-alist
       (quote (("" "color" t)
-          ("" "parskip" t)
-          ("" "tikz" t))))
+              ("" "parskip" t)
+              ("" "tikz" t))))
 #+end_src
 *** Roam
 just set where I want things to be
@@ -2630,11 +2688,11 @@ I like having a keybinding for inserting org roam notes
 (setq org-roam-capture-templates
       `(
         ("d" "default" plain "%?"
-                :if-new
-                (file+head "Inbox/${title}.org" "#+title: ${title}\n")
-                :immediate-finish t
-                :unnarrowed t  )
-                ))
+         :if-new
+         (file+head "Inbox/${title}.org" "#+title: ${title}\n")
+         :immediate-finish t
+         :unnarrowed t  )
+        ))
 
 ;; old templates to consider for future use
 ;; (setq org-roam-capture-templates
@@ -2703,8 +2761,8 @@ I like having a keybinding for inserting org roam notes
   (interactive)
   (let ((org-refile-keep t) ;; Set this to nil to delete the original!
         (org-roam-dailies-capture-templates
-          '(("t" "tasks" entry "%?"
-             :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+         '(("t" "tasks" entry "%?"
+            :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
         (org-after-refile-insert-hook #'save-buffer)
         today-file
         pos)
@@ -2718,31 +2776,32 @@ I like having a keybinding for inserting org roam notes
                    (file-truename (buffer-file-name)))
       (org-refile nil nil (list "Tasks" today-file nil pos)))))
 
-(add-to-list 'org-after-todo-state-change-hook
-             (lambda ()
-               (when (equal org-state "DONE")
-                 (my/org-roam-copy-todo-to-today))))
+(after! org
+  (add-to-list 'org-after-todo-state-change-hook
+               (lambda ()
+                 (when (equal org-state "DONE")
+                   (my/org-roam-copy-todo-to-today))))
+  )
 #+end_src
 **** org-roam-ui
 
 a fantastic package for visualising my content and knowledge
 #+begin_src emacs-lisp
 (use-package! websocket
-    :after org-roam)
+  :after org-roam)
 
 (use-package! org-roam-ui
-    :after org ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+  :after org ;; or :after org
+  ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+  ;;         a hookable mode anymore, you're advised to pick something yourself
+  ;;         if you don't care about startup time, use
+  ;;  :hook (after-init . org-roam-ui-mode)
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 #+end_src
-
 
 
 *** Jupyter notebook
@@ -2756,8 +2815,8 @@ a fantastic package for visualising my content and knowledge
    (jupyter . t)))
 
 (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
-                                                       (:session . "py")
-                                                       (:kernel . "python3")))
+                                                     (:session . "py")
+                                                     (:kernel . "python3")))
 #+end_src
 
 *** Contacts
@@ -2765,13 +2824,74 @@ a fantastic package for visualising my content and knowledge
 (after! org-contacts
   (setq org-contacts-files '("~/Org/contacts.org")))
 #+end_src
+*** Calendar Syncing
+
+Calendar syncing appears to be a little bit of a mess
+There are conflicting outdated views on various forums
+- [[https://www.reddit.com/r/emacs/comments/2mg1q0/syncing_between_orgmode_and_google_calendar/][ical?]]
+- [[https://www.reddit.com/r/emacs/comments/5qd8co/best_method_for_orgmode_google_calendar/][reddit on google calendar integration]]
+- [[https://www.reddit.com/r/orgmode/comments/jxl4f3/sync_calendars_to_orgmode_agenda/][syncing calendars to org-mode agenda]]
+- [[https://superuser.com/questions/176835/syncing-google-calendar-gcal-and-emacs-org-mode-is-it-possible][super user comments]]
+- [[https://www.reddit.com/r/orgmode/comments/x046ec/orggcal_or_something_else_in_2022/][2022 reddit post]]
+- [[https://200ok.ch/posts/2022-02-13_integrating_org_mode_agenda_into_other_calendar_apps.html][custom post]]
+- [[https://joonro.github.io/blog/posts/org-mode-google-calendar-sync-in-windows/][syncing calendars on windows]]
+- [[https://cestlaz.github.io/posts/using-emacs-26-gcal/#.WIqBud9vGAk][custom org-gcal]]
+
+An [[https://orgmode.org/worg/org-tutorials/org-google-sync.html][official tutorial]] which has links to proper solutions but appears to be outdated
+
+Otherwise there are two ways to go:
+**** [[https://github.com/dengste/org-caldav][org-caldav]]
+which works with other calendar providers not just google, but to quote the author
+#+begin_quote
+CalDAV is a mess.
+#+end_quote
+**** [[https://github.com/kidd/org-gcal.el][org-gcal]]
+appears to be the most popular and well used solution. This is despite its confusing forks and [[https://github.com/kidd/org-gcal.el/issues/213][outdated readme]]
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-gcal)
+#+end_src
+
+The basic config is as follows:
+#+begin_src emacs-lisp
+(after! org-gcal
+  (setq org-gcal-fetch-file-alist '(("davidbadams110@gmail.com" .  "~/Org/schedule.org"))
+      fap//org-gcal--warning-period "-1d")
+(setq plstore-cache-passphrase-for-symmetric-encryption t)
+(load-library "~/.doom.d/org-gcal-secrets.el.gpg"))
+#+end_src
+there may be some work to do here about better lazy loading but this will do for now
+
+The load library is curtousy of [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][mastering emacs]]
+
+some extra config inspiration from [[https://github.com/fapdash/dotfiles/blob/e370d5c7633c78e072259acec0057922c660a191/emacs/.emacs#L1168][fapdash]]
+#+begin_src emacs-lisp
+(defun fap//org-gcal-add-warning-period (_calendar-id event _update-mode)
+  "Add a warning period to the plain timestamp in the gcal drawer. Warning periods for plain timestamps are supported by Orgzly."
+  (when (not (org-gcal--event-cancelled-p event))
+    (org-back-to-heading)
+    (org-narrow-to-element)
+    (when (re-search-forward
+           (format "^[ \t]*:%s:[ \t]*$" org-gcal-drawer-name)
+           (point-max)
+           'noerror)
+      (forward-line 1)
+      (when
+          (re-search-forward org-element--timestamp-regexp (point-at-eol) 'noerror)
+        (replace-match (concat "<" (match-string 1) " " fap//org-gcal--warning-period ">"))))))
+(add-hook 'org-gcal-after-update-entry-functions #'fap//org-gcal-add-warning-period)
+#+end_src
+
+if syncing does not appear to be working try [[https://github.com/kidd/org-gcal.el/issues/103][some of these steps]]
+
+there is currently a bug such that if the repeating event is longer than up days it will archive all of the repeating events see [[https://github.com/kidd/org-gcal.el/issues/121][this issue]]. The choices are to see =org-gcal-recurring-events-mode= to =top-level= or =org-gcal-auto-archive= to ='nil=
 
 ** Python
 TODO: fix this crap
 #+begin_src emacs-lisp
 ;; (after! conda
 ;;   (setq conda-anaconda-home "~/micromamba")
-  ;; )
+;; )
 #+end_src
 ** Graphviz
 Graphviz is a nice method of visualising simple graphs, based on plaintext
@@ -2831,36 +2951,36 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
   (save-excursion
     (goto-char (point-min))
     (while (re-search-forward regex nil t)
-        (replace-match replace)
+      (replace-match replace)
       )
+    )
   )
-)
 
 (defun da-clean-stacktrace ()
-;; should have datetime removed
-    (da-delete-regex-whole-buffer "^[[:space:]]+at[[:space:]].*model\\.property\\..*")
-    (da-delete-regex-whole-buffer "^.*Lambda\$[[:digit:]]+.*")
-    (da-delete-regex-whole-buffer "^.*DebugIfSlowEvent\.debugIfSlowOnEDT.*")
+  ;; should have datetime removed
+  (da-delete-regex-whole-buffer "^[[:space:]]+at[[:space:]].*model\\.property\\..*")
+  (da-delete-regex-whole-buffer "^.*Lambda\$[[:digit:]]+.*")
+  (da-delete-regex-whole-buffer "^.*DebugIfSlowEvent\.debugIfSlowOnEDT.*")
   (save-excursion
     (goto-char (point-min))
     (while (re-search-forward "^[[:space:]]+at[[:space:]].*$" nil t)
-        (replace-regexp ",[[:space:]]" ",")
-        (replace-match replace)
+      (replace-regexp ",[[:space:]]" ",")
+      (replace-match replace)
       )
+    )
   )
-)
 
 (defun da-clean-dead ()
   (interactive)
   (goto-char (point-min))
   (if (re-search-forward "\\([[:digit:]]+\\) \\(\\([[:digit:]]+:\\)+\\) WARNING: com.dugeo.util.swing.DeadlockDetector$DeadlockException" nil t)
-    (let ((capture1 (match-string 1))
-        (capture2 (match-string 2)))
+      (let ((capture1 (match-string 1))
+            (capture2 (match-string 2)))
         (message "Captured groups: %s, %s" capture1 capture2)
-    (da-apply-regex-whole-buffer  (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang."))
-    (da-apply-regex-whole-buffer  (concat capture1 " " capture2) "")
-    (da-clean-stacktrace)
-    ))
+        (da-apply-regex-whole-buffer  (concat capture1 " " capture2 "java.lang.") (concat capture1 "-" capture2 "java.lang."))
+        (da-apply-regex-whole-buffer  (concat capture1 " " capture2) "")
+        (da-clean-stacktrace)
+        ))
   )
 
 ;; set auto mode for keymaps
@@ -2916,57 +3036,60 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (unpin! mu4e)
 (unpin! evil-collection)
 (package! libmpdee
- :recipe (:host github :repo "andyetitmoves/libmpdee"))
+  :recipe (:host github :repo "andyetitmoves/libmpdee"))
 (package! mingus
- :recipe (:host github :repo "pft/mingus"))
+  :recipe (:host github :repo "pft/mingus"))
 (unpin! org-roam)
 (package! org-roam-ui)
 (package! grab-x-link
   :recipe (:host github :repo "xuchunyang/grab-x-link"))
+(package! demap)
+(package! svg-lib)
+(package! svg-tag-mode)
 
 ;; (package! ibrowse
 ;;  :recipe (:host github :repo "nicolas-graves/ibrowse.el"))
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;; firefox --remote-debugging-port=9222
-;(package! some-package)
+                                        ;(package! some-package)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
-;(package! another-package
-;  :recipe (:host github :repo "username/repo"))
+                                        ;(package! another-package
+                                        ;  :recipe (:host github :repo "username/repo"))
 
 ;; If the package you are trying to install does not contain a PACKAGENAME.el
 ;; file, or is located in a subdirectory of the repo, you'll need to specify
 ;; `:files' in the `:recipe':
-;(package! this-package
-;  :recipe (:host github :repo "username/repo"
-;           :files ("some-file.el" "src/lisp/*.el")))
+                                        ;(package! this-package
+                                        ;  :recipe (:host github :repo "username/repo"
+                                        ;           :files ("some-file.el" "src/lisp/*.el")))
 
 ;; If you'd like to disable a package included with Doom, you can do so here
 ;; with the `:disable' property:
-;(package! builtin-package :disable t)
+                                        ;(package! builtin-package :disable t)
 
 ;; You can override the recipe of a built in package without having to specify
 ;; all the properties for `:recipe'. These will inherit the rest of its recipe
 ;; from Doom or MELPA/ELPA/Emacsmirror:
-;(package! builtin-package :recipe (:nonrecursive t))
-;(package! builtin-package-2 :recipe (:repo "myfork/package"))
+                                        ;(package! builtin-package :recipe (:nonrecursive t))
+                                        ;(package! builtin-package-2 :recipe (:repo "myfork/package"))
 
 ;; Specify a `:branch' to install a package from a particular branch or tag.
 ;; This is required for some packages whose default branch isn't 'master' (which
 ;; our package manager can't deal with; see raxod502/straight.el#279)
-;(package! builtin-package :recipe (:branch "develop"))
+                                        ;(package! builtin-package :recipe (:branch "develop"))
 
 ;; Use `:pin' to specify a particular commit to install.
-;(package! builtin-package :pin "1a2b3c4d5e")
+                                        ;(package! builtin-package :pin "1a2b3c4d5e")
 
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...
-;(unpin! pinned-package)
+                                        ;(unpin! pinned-package)
 ;; ...or multiple packages
-;(unpin! pinned-package another-pinned-package)
+                                        ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
-;(unpin! t)
+                                        ;(unpin! t)
 #+end_src

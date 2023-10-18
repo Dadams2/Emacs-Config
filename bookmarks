@@ -1,0 +1,35 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("org-refile-last-stored"
+ (filename . "~/Roam/daily/2023-10-18.org")
+ (front-context-string . "** DONE add to m")
+ (rear-context-string . "at 19:08]\n:END:\n")
+ (position . 941)
+ (last-modified 25903 30412 178675 148000))
+("Downloads"
+ (filename . "~/Downloads/")
+ (front-context-string . ":\n  drwxr-xr-x 1")
+ (rear-context-string . "dadams/Downloads")
+ (position . 25)
+ (last-modified 25841 57520 961015 834000))
+("org-capture-last-stored"
+ (filename . "~/Roam/Inbox/Emoji.org")
+ (front-context-string . "\n[[https://tinyp")
+ (rear-context-string . "\n#+title: Emoji\n")
+ (position . 83)
+ (last-modified 25889 16764 19453 493000))
+("mylife.org"
+ (filename . "~/Org/mylife.org")
+ (front-context-string . "#+ARCHIVE: ~/Org")
+ (rear-context-string)
+ (position . 1)
+ (last-modified 25841 55708 406161 819000))
+("config.org"
+ (filename . "~/.doom.d/config.org")
+ (front-context-string . "s\nI like having ")
+ (rear-context-string . "src\n*** Bookmark")
+ (position . 22680)
+ (last-modified 25841 55698 458604 16000))
+)
