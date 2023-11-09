@@ -359,7 +359,7 @@ ansible
 ;;biblio        ; Writes a PhD for you (citation needed)
 (debugger +lsp) ; FIXME stepping through code, to help you add bugs
 ;;direnv        ; be direct about your environment
-;;docker        ; port everything to containers
+docker        ; port everything to containers
 editorconfig    ; let someone else argue about tabs vs spaces
 ;;ein           ; tame Jupyter notebooks with emacs
 (eval +overlay) ; run code, run (also, repls)
@@ -519,7 +519,7 @@ I am a big fan of 'Fira Code'. Font sizes do need some fiddling to get it all ri
       )
 #+end_src
 
-*jlhjjjah**** Missing Fonts
+***** Missing Fonts
 
 Warning about missing fonts is a bit of a problem especially if you are coming to a new system.
 The following code (once again shamelessly ripped from Tec) makes it slightly more nice.
@@ -1092,8 +1092,7 @@ The /very large files/ mode loads large files in chunks, allowing one to open
 ridiculously large files.
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! vlf :recipe (:host github :repo "emacs-straight/vlf" :files ("*.el"))
-  :pin "cacdb359f8c37c6e7e4c7937462b632d22462130")
+(package! vlf :recipe (:host github :repo "emacs-straight/vlf" :files ("*.el")))
 #+end_src
 
 To make VLF available without delaying startup, we'll just load it in quiet moments.
@@ -1392,7 +1391,6 @@ keep
 - extra lists
 hacker, roman
 
-
 *** Aspell
 
 #+begin_src shell :tangle (if (file-expand-wildcards "/usr/lib64/aspell*/en-custom.multi") "no" "setup.sh")
@@ -1403,7 +1401,6 @@ tar -xjf "aspell6-en-custom.tar.bz2"
 cd aspell6-en-custom
 ./configure && make && sudo make install
 #+end_src
-
 
 **** Configuration
 
@@ -1417,7 +1414,6 @@ Also having a personal dictionary that is separate from the original is useful
 #+begin_src emacs-lisp
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 #+end_src
-
 
 *** YASnippet
 
@@ -1452,6 +1448,13 @@ A very nice extension to dired that seems significantly less buggy than =ranger.
 ;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
 
 #+end_src
+*** Hex Editing
+
+=hexl-mode= is pretty good. But I want it to display like hexdump
+#+begin_src emacs-lisp
+(setq hexl-bits 8)
+#+end_src
+
 
 ** Visuals
 
