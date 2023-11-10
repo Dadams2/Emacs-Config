@@ -1671,7 +1671,6 @@ This script also supports the following flags
 + ~--enable~ to enable all relevant systemd services
 + ~--disable~ to disable all relevant systemd services
 #+begin_src python :tangle misc/mbsync-imapnotify.py :shebang "#!/usr/bin/env python3"
-#!/usr/bin/env python3
 from pathlib import Path
 import json
 import re
