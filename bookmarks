@@ -4,10 +4,10 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-refile-last-stored"
  (filename . "~/Roam/daily/2023-10-18.org")
- (front-context-string . "** DONE add to m")
+ (front-context-string . "** DONE consider")
  (rear-context-string . "at 19:08]\n:END:\n")
- (position . 941)
- (last-modified 25903 30412 178675 148000))
+ (position . 1237)
+ (last-modified 25903 34718 582838 156000))
 ("Downloads"
  (filename . "~/Downloads/")
  (front-context-string . ":\n  drwxr-xr-x 1")
@@ -15,11 +15,11 @@
  (position . 25)
  (last-modified 25841 57520 961015 834000))
 ("org-capture-last-stored"
- (filename . "~/Roam/Inbox/Emoji.org")
- (front-context-string . "\n[[https://tinyp")
- (rear-context-string . "\n#+title: Emoji\n")
- (position . 83)
- (last-modified 25889 16764 19453 493000))
+ (filename . "~/Sync/Org/todo.org")
+ (front-context-string . "** TODO work out")
+ (rear-context-string . "d Tasks\n* Inbox\n")
+ (position . 65)
+ (last-modified 25903 34710 586200 115000))
 ("mylife.org"
  (filename . "~/Org/mylife.org")
  (front-context-string . "#+ARCHIVE: ~/Org")

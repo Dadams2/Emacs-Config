@@ -8,3 +8,5 @@ packages.el
 custom.el
 config.*
 !config.org
+*.svg
+bookmarks
