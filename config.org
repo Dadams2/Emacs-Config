@@ -26,6 +26,7 @@
   - [[#python][Python]]
   - [[#graphviz][Graphviz]]
   - [[#regex][Regex]]
+  - [[#hex][Hex]]
 -   [[#the-rest][The rest]]
 - [[#org-jira-things][Org Jira things]]
 - [[#other-packages][Other packages]]
@@ -1448,13 +1449,6 @@ A very nice extension to dired that seems significantly less buggy than =ranger.
 ;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
 
 #+end_src
-*** Hex Editing
-
-=hexl-mode= is pretty good. But I want it to display like hexdump
-#+begin_src emacs-lisp
-(setq hexl-bits 8)
-#+end_src
-
 
 ** Visuals
 
@@ -2919,6 +2913,13 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 
 #+begin_src emacs-lisp
 (setq reb-re-syntax 'string)
+#+end_src
+
+** Hex
+
+=hexl-mode= is pretty good. But I want it to display like hexdump
+#+begin_src emacs-lisp
+(setq hexl-bits 8)
 #+end_src
 
 *   The rest
