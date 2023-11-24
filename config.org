@@ -3012,6 +3012,10 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 ;; (after! tramp
 ;; (setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*"))
 
+(after! micromamba
+(setq micromamba-executable "/d/sw/micromamba/0.26.0/micromamba")
+)
+
 #+end_src
 * Org Jira things
 
