@@ -3049,6 +3049,7 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 (package! demap)
 (package! svg-lib)
 (package! svg-tag-mode)
+(package! micromamba)
 
 ;; (package! ibrowse
 ;;  :recipe (:host github :repo "nicolas-graves/ibrowse.el"))
