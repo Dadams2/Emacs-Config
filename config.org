@@ -1416,6 +1416,18 @@ Also having a personal dictionary that is separate from the original is useful
 (setq ispell-personal-dictionary (expand-file-name ".ispell_personal" doom-private-dir))
 #+end_src
 
+*** Flyspell
+
+I much prefer flyspells interface for correcting, spelling. But I really like the way that Ispell goes through all the problems in the buffer.
+So lets just write a function for doing that:
+#+begin_src emacs-lisp
+(defun da/ispell ()
+  (interactive)
+    (while (not (flyspell-goto-next-error))
+       (flyspell-correct-at-point)))
+#+end_src
+
+
 *** YASnippet
 
 nested snippets are good so:
