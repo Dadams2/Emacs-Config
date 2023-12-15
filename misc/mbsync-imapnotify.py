@@ -116,8 +116,8 @@ def finaliseAccount():
         print(f"  \033[1;37m{key:<13} {valColor}{val}\033[0;37m")
 
     if (
-        len(currentAccountData["boxes"]) > 15
-        and "@gmail.com" in currentAccountData["username"]
+            len(currentAccountData["boxes"]) > 15
+            and "@gmail.com" in currentAccountData["username"]
     ):
         print(
             "  \033[1;31mWarning:\033[0;31m Gmail raises an error when more than"
@@ -209,7 +209,7 @@ def enableAccountSystemdServices(accounts):
     for account in accounts:
         print(f" \033[0;32m - \033[1;37m{account:<18}", end="\033[0;37m", flush=True)
         if setSystemdServiceState(
-            "enable", f"goimapnotify@{accountToFoldername(account)}.service"
+                "enable", f"goimapnotify@{accountToFoldername(account)}.service"
         ):
             print("\033[1;32m enabled")
 
@@ -218,7 +218,7 @@ def disableAccountSystemdServices(accounts):
     for account in accounts:
         print(f" \033[0;33m - \033[1;37m{account:<18}", end="\033[0;37m", flush=True)
         if setSystemdServiceState(
-            "disable", f"goimapnotify@{accountToFoldername(account)}.service"
+                "disable", f"goimapnotify@{accountToFoldername(account)}.service"
         ):
             print("\033[1;33m disabled")
 
@@ -227,7 +227,7 @@ def restartAccountSystemdServices(accounts):
     for account in accounts:
         print(f" \033[0;34m - \033[1;37m{account:<18}", end="\033[0;37m", flush=True)
         if setSystemdServiceState(
-            "restart", f"goimapnotify@{accountToFoldername(account)}.service"
+                "restart", f"goimapnotify@{accountToFoldername(account)}.service"
         ):
             print("\033[1;34m restarted")
 
@@ -285,7 +285,7 @@ def getAccountServiceStates(accounts):
 
 
 if len(sys.argv) > 1:
-    if sys.argv[1] in ["-e", "--enable"]:
+    if sys.argv[1]   in ["-e", "--enable"]:
         enableAccountSystemdServices(oldAccounts)
         exit()
     elif sys.argv[1] in ["-d", "--disable"]:
@@ -298,8 +298,7 @@ if len(sys.argv) > 1:
         getAccountServiceStates(oldAccounts)
         exit()
     elif sys.argv[1] in ["-h", "--help"]:
-        print(
-            """\033[1;37mMbsync to IMAP Notify config generator.\033[0;37m
+        print("""\033[1;37mMbsync to IMAP Notify config generator.\033[0;37m
 
 Usage: mbsync-imapnotify [options]
 
@@ -309,9 +308,7 @@ Options:
     -r, --restart      restart all services
     -s, --status       fetch the status for all services
     -h, --help         show this help
-""",
-            end="",
-        )
+""", end='')
         exit()
     else:
         print(f"\033[0;31mFlag {sys.argv[1]} not recognised, try --help\033[0;37m")
