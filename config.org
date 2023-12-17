@@ -85,7 +85,9 @@ From ~GPG~ to ~git~ to email clients and snippets, the following seems kinda imp
 ** Default settings
 
 *** Common settings
-Following in Tec's footsteps I somehow stumbled upon [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][angrybacon/dotemacs]] which gave some inspiration on better default settings
+Following in
+
+Tec's footsteps I somehow stumbled upon [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][angrybacon/dotemacs]] which gave some inspiration on better default settings
 
 #+begin_src emacs-lisp
 (setq-default
@@ -357,7 +359,7 @@ despite the name herein lies some of the things that make emacs worth using.
 #+name: doom-tools
 #+begin_src emacs-lisp
 ansible
-;;biblio        ; Writes a PhD for you (citation needed)
+biblio        ; Writes a PhD for you (citation needed)
 (debugger +lsp) ; FIXME stepping through code, to help you add bugs
 ;;direnv        ; be direct about your environment
 docker        ; port everything to containers
@@ -809,7 +811,7 @@ Also make sure to switch to the dashboard.
 
 *** Full screen
 
-The majority of screens that I work on are 1080p so having emacs full screen by default is nice for them.
+The majority of screens that I work on are 1080p so having Emacs full screen by default is nice for them.
 Should I switch to higher resolution displays this will likely become system dependent.
 #+begin_src emacs-lisp
 ;; auto fullscreen
@@ -2402,6 +2404,7 @@ The beginning of a great journey
 (setq org-agenda-files '("~/Org/experiments.org"
                          "~/Org/mylife.org"
                          "~/Org/birthday.org"
+                         "~/Org/projects.org"
                          "~/Org/longrunning.org"
                          "~/Org/Mail.org"))
 
@@ -2854,19 +2857,22 @@ which works with other calendar providers not just google, but to quote the auth
 CalDAV is a mess.
 #+end_quote
 **** [[https://github.com/kidd/org-gcal.el][org-gcal]]
+
+**until [[https://github.com/kidd/org-gcal.el/issues/238][this issue]] with gnupg is solved this package probably wont work**
+
 appears to be the most popular and well used solution. This is despite its confusing forks and [[https://github.com/kidd/org-gcal.el/issues/213][outdated readme]]
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! org-gcal)
+;; (package! org-gcal)
 #+end_src
 
 The basic config is as follows:
 #+begin_src emacs-lisp
-(after! org-gcal
-  (setq org-gcal-fetch-file-alist '(("davidbadams110@gmail.com" .  "~/Org/schedule.org"))
-      fap//org-gcal--warning-period "-1d")
-(setq plstore-cache-passphrase-for-symmetric-encryption t)
-(load-library "~/.doom.d/org-gcal-secrets.el.gpg"))
+;; (after! org-gcal
+;;   (setq org-gcal-fetch-file-alist '(("davidbadams110@gmail.com" .  "~/Org/schedule.org"))
+;;       fap//org-gcal--warning-period "-1d")
+;; (setq plstore-cache-passphrase-for-symmetric-encryption t)
+;; (load-library "~/.doom.d/org-gcal-secrets.el.gpg"))
 #+end_src
 there may be some work to do here about better lazy loading but this will do for now
 
@@ -2874,25 +2880,35 @@ The load library is curtousy of [[https://www.masteringemacs.org/article/keeping
 
 some extra config inspiration from [[https://github.com/fapdash/dotfiles/blob/e370d5c7633c78e072259acec0057922c660a191/emacs/.emacs#L1168][fapdash]]
 #+begin_src emacs-lisp
-(defun fap//org-gcal-add-warning-period (_calendar-id event _update-mode)
-  "Add a warning period to the plain timestamp in the gcal drawer. Warning periods for plain timestamps are supported by Orgzly."
-  (when (not (org-gcal--event-cancelled-p event))
-    (org-back-to-heading)
-    (org-narrow-to-element)
-    (when (re-search-forward
-           (format "^[ \t]*:%s:[ \t]*$" org-gcal-drawer-name)
-           (point-max)
-           'noerror)
-      (forward-line 1)
-      (when
-          (re-search-forward org-element--timestamp-regexp (point-at-eol) 'noerror)
-        (replace-match (concat "<" (match-string 1) " " fap//org-gcal--warning-period ">"))))))
-(add-hook 'org-gcal-after-update-entry-functions #'fap//org-gcal-add-warning-period)
+;; (defun fap//org-gcal-add-warning-period (_calendar-id event _update-mode)
+;;   "Add a warning period to the plain timestamp in the gcal drawer. Warning periods for plain timestamps are supported by Orgzly."
+;;   (when (not (org-gcal--event-cancelled-p event))
+;;     (org-back-to-heading)
+;;     (org-narrow-to-element)
+;;     (when (re-search-forward
+;;            (format "^[ \t]*:%s:[ \t]*$" org-gcal-drawer-name)
+;;            (point-max)
+;;            'noerror)
+;;       (forward-line 1)
+;;       (when
+;;           (re-search-forward org-element--timestamp-regexp (point-at-eol) 'noerror)
+;;         (replace-match (concat "<" (match-string 1) " " fap//org-gcal--warning-period ">"))))))
+;; (add-hook 'org-gcal-after-update-entry-functions #'fap//org-gcal-add-warning-period)
 #+end_src
 
 if syncing does not appear to be working try [[https://github.com/kidd/org-gcal.el/issues/103][some of these steps]]
 
 there is currently a bug such that if the repeating event is longer than up days it will archive all of the repeating events see [[https://github.com/kidd/org-gcal.el/issues/121][this issue]]. The choices are to see =org-gcal-recurring-events-mode= to =top-level= or =org-gcal-auto-archive= to ='nil=
+
+for this error:
+#+begin_example
+deferred error : (error "oauth2-auto: Unknown provider: org-gcal")
+#+end_example
+
+#+begin_src emacs-lisp :tangle no
+(org-gcal-reload-client-id-secret)
+#+end_src
+
 
 ** Python
 TODO: fix this crap
