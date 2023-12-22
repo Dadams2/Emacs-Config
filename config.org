@@ -2201,6 +2201,26 @@ ExecStart=/usr/bin/mbsync -c /home/dadams/.mbsyncrc --all
 [Install]
 WantedBy=suspend.target
 #+end_src
+**** About microsoft outlook
+Most organisational microsoft accounts don't allow you to create app passwords, nor do they allow app registration for use with tools like [[https://github.com/pdobsan/mailctl][mailctl]].
+From the [[https://wiki.archlinux.org/title/Isync#oauth2token][arch wiki]] it should be possible to use thunderbirds =client_id= to authenticate but this is often blocked by organisations and you can [[https://github.com/pdobsan/mailctl/issues/31][run into issues]].
+Other scripts can also [[https://github.com/pdobsan/mailctl/issues/18][suffer]] the same issue such as [[https://github.com/ferdinandyb/dotfiles/blob/ba0ff997ee19e53c96017269d0e852776e256f82/.config/emailconfiguration/mutt_oauth2.py#L64][mutt_aoth2.py]]
+
+however to use it you will first need to install the xoauth2 sasl plugin
+#+begin_src bash
+paru cyrus-sasl-xoauth2-git
+#+end_src
+
+then authorize mailclt
+#+begin_src bash
+mailctl authorize service email
+#+end_src
+
+But even if you get all of this working you still might encounter
+#+begin_example
+IMAP command 'NAMESPACE' returned an error: User is authenticated but not connected.
+#+end_example
+which form [[https://stackoverflow.com/questions/74474142/namespace-command-with-a-bad-response-user-is-authenticated-but-not-connect][stackoverflow]] appears to mean the account cannot access email over imap
 
 *** Indexing
 
