@@ -2207,12 +2207,12 @@ From the [[https://wiki.archlinux.org/title/Isync#oauth2token][arch wiki]] it sh
 Other scripts can also [[https://github.com/pdobsan/mailctl/issues/18][suffer]] the same issue such as [[https://github.com/ferdinandyb/dotfiles/blob/ba0ff997ee19e53c96017269d0e852776e256f82/.config/emailconfiguration/mutt_oauth2.py#L64][mutt_aoth2.py]]
 
 however to use it you will first need to install the xoauth2 sasl plugin
-#+begin_src bash
+#+begin_src bash :tangle no
 paru cyrus-sasl-xoauth2-git
 #+end_src
 
-then authorize mailclt
-#+begin_src bash
+then authorize mailctl
+#+begin_src bash :tangle no
 mailctl authorize service email
 #+end_src
 
