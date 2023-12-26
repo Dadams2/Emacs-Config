@@ -2468,7 +2468,7 @@ The beginning of a great journey
     (while (re-search-forward "TODO" nil t)
       (org-refile))))
 ;; Save Org buffers after refiling!
-;; (advice-add 'org-refile :after 'org-save-all-org-buffers)
+(advice-add 'org-refile :after 'org-save-all-org-buffers)
 #+end_src
 *** Modules
 #+begin_src emacs-lisp
@@ -3005,7 +3005,7 @@ npm install -g markdownlint-cli
 on arch Linux this should be installed as its own package as the node-js installation will be rejected.
 
 you can check that it was enabled properly by running
-#+begin_src emacs-lisp :results none
+#+begin_src emacs-lisp :tangle no :results none
 (flycheck-verify-setup)
 #+end_src
 
