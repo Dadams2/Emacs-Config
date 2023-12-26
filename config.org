@@ -27,6 +27,7 @@
   - [[#graphviz][Graphviz]]
   - [[#regex][Regex]]
   - [[#hex][Hex]]
+  - [[#markdown][Markdown]]
 -   [[#the-rest][The rest]]
 - [[#org-jira-things][Org Jira things]]
 - [[#other-packages][Other packages]]
@@ -2980,6 +2981,32 @@ Graphviz is a nice method of visualising simple graphs, based on plaintext
 #+begin_src emacs-lisp
 (setq hexl-bits 8)
 #+end_src
+** Markdown
+
+flycheck is pre-configured in doom to use markdownlint in doom
+
+[[doom-module:format]] has uses flycheck.
+[[https://www.flycheck.org/en/latest/user/quickstart.html][flycheck]] has support for [[https://github.com/igorshubovych/markdownlint-cli][markdown-cli]] (see [[help:flycheck-checkers]]) which must be installed with npm
+#+begin_src shell :eval no :tangle (if (executable-find "markdownlint-cli") "no" "setup.sh")
+npm install -g markdownlint-cli
+#+end_src
+
+*this is not installed by doom by default so must be done manually*
+
+on arch Linux this should be installed as its own package as the node-js installation will be rejected.
+
+you can check that it was enabled properly by running
+#+begin_src emacs-lisp :results none
+(flycheck-verify-setup)
+#+end_src
+
+*** Different versions
+[[https://github.com/markdownlint/markdownlint][markdownlint]] is a ruby gem which is used by the corresponding vscode extension
+[[https://github.com/DavidAnson/markdownlint][markdownlint]] - A similar project, but limited in Node.js
+[[https://github.com/igorshubovych/markdownlint-cli][markdownlint-cli]] - A CLI for the above Node.js project
+[[https://github.com/DavidAnson/markdownlint-cli2][markdownlint-cli2]] - An alternative CLI for the Node.js project
+currently markdownlint-cli2 isn't automatically included
+
 
 *   The rest
 
