@@ -2592,7 +2592,13 @@ The ~@~ character indicates note with timestamp and ~!~ is just timestamp
         ("idea" . ?i)))
 #+end_src
 **** Capture Templates
-a straight rip of the doom config
+a straight rip of the doom config plus some additions
+
+I think it makes sense to always ad an ID to things thanks to [[https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode][stackoverflow]]
+#+begin_src emacs-lisp
+(add-hook 'org-capture-prepare-finalize-hook 'org-id-get-create)
+#+end_src
+
 #+begin_src emacs-lisp
 (defvar my/org-contacts-template
   (concat "* %(org-contacts-template-name)\n"
@@ -2616,20 +2622,25 @@ a straight rip of the doom config
          (file+headline +org-capture-todo-file "Inbox")
          "* %?\n:LOGBOOK:\n- Added: %U\n:END:\n\n%i\n%a" :prepend t)
 
+
+        ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+        "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+	("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+        "* %? [[%:link][%:description]] \nCaptured On: %U")
         ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
         ;; {todo,notes,changelog}.org file is found in a parent directory.
         ;; Uses the basename from `+org-capture-todo-file',
         ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
-        ("p" "Templates for projects")
-        ("pt" "Project-local todo" entry  ; {project-root}/todo.org
-         (file+headline +org-capture-project-todo-file "Inbox")
-         "* TODO %?\n%i\n%a" :prepend t)
-        ("pn" "Project-local notes" entry  ; {project-root}/notes.org
-         (file+headline +org-capture-project-notes-file "Inbox")
-         "* %U %?\n%i\n%a" :prepend t)
-        ("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
-         (file+headline +org-capture-project-changelog-file "Unreleased")
-         "* %U %?\n%i\n%a" :prepend t)
+        ;; ("p" "Templates for projects")
+        ;; ("pt" "Project-local todo" entry  ; {project-root}/todo.org
+        ;;  (file+headline +org-capture-project-todo-file "Inbox")
+        ;;  "* TODO %?\n%i\n%a" :prepend t)
+        ;; ("pn" "Project-local notes" entry  ; {project-root}/notes.org
+        ;;  (file+headline +org-capture-project-notes-file "Inbox")
+        ;;  "* %U %?\n%i\n%a" :prepend t)
+        ;; ("pc" "Project-local changelog" entry  ; {project-root}/changelog.org
+        ;;  (file+headline +org-capture-project-changelog-file "Unreleased")
+        ;;  "* %U %?\n%i\n%a" :prepend t)
 
         ("c" "Contact" entry (file+headline "~/Org/contacts.org" "Inbox"),
          my/org-contacts-template
