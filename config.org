@@ -1085,7 +1085,16 @@ This simply disables the global =C-h= for help.
 (map! :after vterm
       :map vterm-mode-map
       "C-a" #'vterm-send-C-a
-      "C-h" #'vterm-send-C-h)
+      "C-h" #'vterm-send-C-h
+      "C-S-t" #'+vterm/toggle)
+
+#+end_src
+*** Dired
+image dired is really useful and I would like to be able to bring it up more often
+#+begin_src emacs-lisp
+(map! :after dired
+      :map dired-mode-map
+      "C-S-i" #'image-dired)
 #+end_src
 
 ** Tools
