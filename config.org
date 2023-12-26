@@ -636,8 +636,11 @@ avoid polluting the output.
 
 I literally cannot function without relative lines numbers
 #+begin_src emacs-lisp
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'visual)
 #+end_src
+I recently changed this to be visual as I want to be able to do vim style jumps with folds
+see [[help:display-line-numbers-type]]
+
 *** Bookmarks
 I like having access to bookmarks so lets save them in sane places and have a keybinding
 
