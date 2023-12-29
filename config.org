@@ -600,6 +600,11 @@ there are also a few other nice things I like
 (setq doom-modeline-enable-word-count t) ; super nice in visual mode
 (setq doom-modeline-persp-name t) ; I want to know where I am
 #+end_src
+**** Word wrapping
+#+begin_src emacs-lisp
+;; (setq +word-wrap-fill-style 'auto)
+#+end_src
+
 ** Fixing bugs
 
 in =mu= > 1.8 there is a problem with dooms default popup rules. Lets fix this
@@ -1089,7 +1094,8 @@ This simply disables the global =C-h= for help.
       :map vterm-mode-map
       "C-a" #'vterm-send-C-a
       "C-h" #'vterm-send-C-h
-      "C-S-t" #'+vterm/toggle)
+      "C-S-t" #'+vterm/toggle
+      "C-S-v" #'evil-collection-vterm-paste-after)
 
 #+end_src
 *** Dired
@@ -1476,6 +1482,8 @@ A very nice extension to dired that seems significantly less buggy than =ranger.
 ;;         "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group"))
 
 #+end_src
+*** Vertico
+
 
 ** Visuals
 
@@ -2471,7 +2479,7 @@ The beginning of a great journey
     (while (re-search-forward "TODO" nil t)
       (org-refile))))
 ;; Save Org buffers after refiling!
-(advice-add 'org-refile :after 'org-save-all-org-buffers)
+;; (advice-add 'org-refile :after 'org-save-all-org-buffers)
 #+end_src
 *** Modules
 #+begin_src emacs-lisp
