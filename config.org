@@ -1344,9 +1344,14 @@ because it faster
 
 
 ;; (setq projectile-project-search-path '("~/Things/"))
-
-
 #+end_src
+#+begin_src emacs-lisp
+(after! projectile
+  (add-hook 'projectile-after-switch-project-hook
+            (lambda ()
+              (magit-status))))
+#+end_src
+
 *** Smerge
 The default keybindings are not the best really, and could use some improvement.
 Especially in keeping all changes.
@@ -2742,6 +2747,15 @@ I like having a keybinding for inserting org roam notes
 (map! :map org-mode-map
       :after org
       "C-S-n" #'org-roam-node-insert)
+#+end_src
+
+While computing the unlinked references may be slow, I haven't figured out how to do this on demand just yet.
+#+begin_src emacs-lisp
+(setq org-roam-mode-sections
+      (list #'org-roam-backlinks-section
+            #'org-roam-reflinks-section
+            #'org-roam-unlinked-references-section
+            ))
 #+end_src
 
 **** Templates
