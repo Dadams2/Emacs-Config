@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: org habit style
+# uuid:
+# key: sth
+# condition: t
+# --
+:STYLE: habit
