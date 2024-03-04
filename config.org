@@ -28,7 +28,6 @@
   - [[#hex][Hex]]
   - [[#markdown][Markdown]]
 -   [[#the-rest][The rest]]
-- [[#org-jira-things][Org Jira things]]
 - [[#other-packages][Other packages]]
 
 * Preamble
@@ -3123,11 +3122,6 @@ currently markdownlint-cli2 isn't automatically included
 )
 
 #+end_src
-* Org Jira things
-
-#+begin_src emacs-lisp
-(setq jiralib-url "https://jira.dug.com")
-#+end_src
 
 * Other packages
 
@@ -3142,7 +3136,6 @@ currently markdownlint-cli2 isn't automatically included
 (package! ox-gfm)
 (package! ztree)
 (package! pair-tree)
-(package! org-jira)
 (package! restclient)
 (package! org-web-tools)
 (package! catppuccin-theme)
