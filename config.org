@@ -167,6 +167,12 @@ TODO: consider a better face for it
   (define-key embark-bookmark-map (kbd "o") (my/embark-ace-action bookmark-jump))
   )
 #+end_src
+*** Macos specific
+given how the commands usually change on macos this makes more sense to me
+#+begin_src emacs-lisp
+(setq mac-command-modifier 'control)
+#+end_src
+
 
 **  Doom Config
 
@@ -500,9 +506,9 @@ TODO: due to a bug in async tangle we don't include this
 
 I am a big fan of 'Fira Code'. Font sizes do need some fiddling to get it all right.
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Fira Code" :size 16)
-      doom-big-font (font-spec :family "Fira Code" :size 24)
-      doom-variable-pitch-font (font-spec :family "Overpass" :size 24)
+(setq doom-font (font-spec :family "Fira Code" :size 12)
+      doom-big-font (font-spec :family "Fira Code" :size 16)
+      doom-variable-pitch-font (font-spec :family "Overpass" :size 16)
       doom-unicode-font (font-spec :family "JuliaMono")
       doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
       )
@@ -2372,33 +2378,6 @@ We can also use this a signature,
 #+end_src
 
 
-**** some visual improvements
-:PROPERTIES:
-:header-args:emacs-lisp: :tangle no :noweb-ref mu4e-conf
-:END:
-
-just makes the icons slightly better for unicode fonts
-#+begin_src emacs-lisp
-;; (cl-flet* ((make-help-button (text help-echo)
-;;              (with-temp-buffer
-;;                (insert-text-button text
-;;                                    'help-echo help-echo
-;;                                    'mouse-face nil)
-;;                (buffer-string)))
-;;            (make-help-button-cons (text1 text2 help-echo)
-;;              (cons (make-help-button text1 help-echo)
-;;                    (make-help-button text2 help-echo))))
-;;   (setq mu4e-headers-threaded-label
-;;         (make-help-button-cons "T" (concat " " (all-the-icons-octicon "git-branch" :v-adjust 0.05))
-;;                                "Thread view")
-;;         mu4e-headers-related-label
-;;         (make-help-button-cons "R" (concat " " (all-the-icons-material "link" :v-adjust -0.1))
-;;                                "Showing related emails")
-;;         mu4e-headers-full-label
-;;         (make-help-button-cons "F" (concat " " (all-the-icons-material "disc_full"))
-;;                                "Search is full!")))
-#+end_src
-
 *** Notifications
 the main version of mu4e alert is kinda broken which is a shame. Need to keep an
 eye on [[https://github.com/iqbalansari/mu4e-alert/issues/40][main issue]]. Untill then at least this fork is *slightly* less broken
@@ -2721,6 +2700,11 @@ I think it makes sense to always ad an ID to things thanks to [[https://stackove
               ("" "parskip" t)
               ("" "tikz" t))))
 #+end_src
+**** Citation support
+#+begin_src emacs-lisp
+(setq! citar-bibliography '("~/Org/references.bib"))
+#+end_src
+
 *** Roam
 just set where I want things to be
 #+begin_src emacs-lisp
