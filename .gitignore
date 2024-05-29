@@ -10,3 +10,4 @@ config.*
 !config.org
 *.svg
 bookmarks
+*.gpg

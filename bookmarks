@@ -3,11 +3,11 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-refile-last-stored"
- (filename . "~/Roam/daily/2023-10-18.org")
- (front-context-string . "** DONE consider")
- (rear-context-string . "at 19:08]\n:END:\n")
- (position . 1237)
- (last-modified 25903 34718 582838 156000))
+ (filename . "~/Roam/daily/2023-12-26.org")
+ (front-context-string . "** DONE Refile [")
+ (rear-context-string . "c9108434][kew]]\n")
+ (position . 4632)
+ (last-modified 25994 57056 147231 239000))
 ("Downloads"
  (filename . "~/Downloads/")
  (front-context-string . ":\n  drwxr-xr-x 1")
@@ -15,11 +15,11 @@
  (position . 25)
  (last-modified 25841 57520 961015 834000))
 ("org-capture-last-stored"
- (filename . "~/Sync/Org/todo.org")
- (front-context-string . "** TODO work out")
- (rear-context-string . "d Tasks\n* Inbox\n")
- (position . 65)
- (last-modified 25903 34710 586200 115000))
+ (filename . "~/Roam/Inbox/kew.org")
+ (front-context-string . "\nformally known ")
+ (rear-context-string . "D:\n#+title: kew\n")
+ (position . 81)
+ (last-modified 25994 55131 673417 246000))
 ("mylife.org"
  (filename . "~/Org/mylife.org")
  (front-context-string . "#+ARCHIVE: ~/Org")
