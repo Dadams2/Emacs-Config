@@ -1086,7 +1086,7 @@ This simply disables the global =C-h= for help.
       "C-a" #'vterm-send-C-a
       "C-h" #'vterm-send-C-h
       "C-S-t" #'+vterm/toggle
-      "C-S-v" #'evil-collection-vterm-paste-after)
+      "C-S-v" #'evil-paste-after)
 
 #+end_src
 *** Dired
