@@ -3010,7 +3010,6 @@ you can check that it was enabled properly by running
 [[https://github.com/DavidAnson/markdownlint-cli2][markdownlint-cli2]] - An alternative CLI for the Node.js project
 currently markdownlint-cli2 isn't automatically included
 
-
 *   The rest
 
 #+begin_src emacs-lisp
