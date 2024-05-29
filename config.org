@@ -434,6 +434,7 @@ latex               ; writing papers in Emacs has never been so fun
  +pandoc
  +present
  +roam2
+ +hugo
  +gnuplot
  +dragndrop
  +contacts
@@ -2733,11 +2734,12 @@ While computing the unlinked references may be slow, I haven't figured out how t
 
 (setq org-roam-capture-templates
       `(
-        ("d" "default" plain "%?"
-         :if-new
-         (file+head "Inbox/${title}.org" "#+title: ${title}\n")
+        ("d" "default" plain
+         "\n*Link*:  %?\n\n"
+         :if-new (file+head "Inbox/${title}.org" "#+title: ${title}\n#+hugo_section: braindump\n#+date: %u\n#+hugo_lastmod: %u\n")
          :immediate-finish t
-         :unnarrowed t  )
+         :unnarrowed t
+         :empty-lines-after 1)
         ))
 
 ;; old templates to consider for future use
@@ -2848,7 +2850,16 @@ a fantastic package for visualising my content and knowledge
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 #+end_src
-
+**** Ox-hugo Export
+#+begin_src emacs-lisp
+;; Update last modified date for ox-hugo export
+(after! org
+  (setq time-stamp-active t
+        time-stamp-start "#\\+hugo_lastmod:[ \t]*"
+        time-stamp-end "$"
+        time-stamp-format "\[%Y-%m-%d\]")
+  (add-hook 'before-save-hook 'time-stamp))
+#+end_src
 
 *** Jupyter notebook
 #+begin_src emacs-lisp
