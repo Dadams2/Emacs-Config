@@ -2700,11 +2700,19 @@ I think it makes sense to always ad an ID to things thanks to [[https://stackove
       (quote (("" "color" t)
               ("" "parskip" t)
               ("" "tikz" t))))
+(setq org-latex-src-block-backend 'listings)
 #+end_src
 **** Citation support
 #+begin_src emacs-lisp
 (setq! citar-bibliography '("~/Org/references.bib"))
 #+end_src
+
+we also have set the [[id:bbd29d55-e8d2-4f46-9a9b-952400cec235][CSL]] styles courtesy of [[https://blog.tecosaur.com/tmio/2021-07-31-citations.html][this month in org's]] advice
+#+begin_src emacs-lisp
+(setq org-cite-csl-styles-dir "~/Zotero/styles")
+
+#+end_src
+
 
 *** Roam
 just set where I want things to be
