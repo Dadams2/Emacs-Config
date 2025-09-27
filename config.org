@@ -473,7 +473,7 @@ A constant work in progress. But trying to understand it does teach you a bunch.
 
 #+name: doom-email
 #+begin_src emacs-lisp
-(:if (executable-find "mu") (mu4e +gmail +org))
+(:if (executable-find "mu") (mu4e +gmail))
 ;;notmuch
 ;;(wanderlust +gmail)
 #+end_src
@@ -570,7 +570,7 @@ I like the softer look of Nord and use it in a number of other places. There are
 but overall its nice.
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-nord)
+(setq doom-theme 'doom-one)
 #+end_src
 
 I use linux on all my systems so I don't need to be told that =LF UTF-8= is my file encoding all the time
