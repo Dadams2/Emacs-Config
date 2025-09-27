@@ -2314,7 +2314,7 @@ These be important
 :END:
 Let's send emails too.
 #+begin_src emacs-lisp
-(setq sendmail-program "/usr/bin/msmtp"
+(setq sendmail-program "/opt/homebrew/bin/msmtp"
       send-mail-function #'smtpmail-send-it
       message-sendmail-f-is-evil t
       message-sendmail-extra-arguments '("--read-envelope-from"); , "--read-recipients")
