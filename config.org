@@ -1066,7 +1066,7 @@ The =rotate= package just adds the ability to rotate window layouts, but that
 sounds nice to me.
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! rotate :pin "4e9ac3ff800880bd9b705794ef0f7c99d72900a6")
+(package! rotate)
 #+end_src
 
 *** Which-key
@@ -1488,7 +1488,7 @@ A very nice extension to dired that seems significantly less buggy than =ranger.
 
 Drew Adams =info+= package is really nice but having nice colours is even better.
 #+begin_src emacs-lisp :tangle packages.el
-(package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
+(package! info-colors)
 #+end_src
 
 simply hook into =info=
@@ -1505,7 +1505,7 @@ simply hook into =info=
 Themes are sometimes hard to match in terminals especially given settings. This is a way of helping this.
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! theme-magic :pin "844c4311bd26ebafd4b6a1d72ddcc65d87f074e3")
+(package! theme-magic)
 #+end_src
 
 # This operates using =pywal=, which is present in some repositories, but most
@@ -2975,7 +2975,7 @@ TODO: fix this crap
 Graphviz is a nice method of visualising simple graphs, based on plaintext
 =.dot= / =.gv= files.
 #+begin_src emacs-lisp :tangle packages.el
-(package! graphviz-dot-mode :pin "6e96a89762760935a7dff6b18393396f6498f976")
+(package! graphviz-dot-mode)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -3141,7 +3141,7 @@ currently markdownlint-cli2 isn't automatically included
 (package! restclient)
 (package! org-web-tools)
 (package! catppuccin-theme)
-(unpin! mu4e)
+;; (unpin! mu4e)
 (unpin! evil-collection)
 (package! libmpdee
   :recipe (:host github :repo "andyetitmoves/libmpdee"))
