@@ -22,6 +22,7 @@
   - [[#rssnewsfeed-reader][RSS/Newsfeed Reader]]
 - [[#languages][Languages]]
   - [[#org][Org]]
+  - [[#latex][Latex]]
   - [[#python][Python]]
   - [[#graphviz][Graphviz]]
   - [[#regex][Regex]]
@@ -2962,7 +2963,11 @@ deferred error : (error "oauth2-auto: Unknown provider: org-gcal")
 #+begin_src emacs-lisp :tangle no
 (org-gcal-reload-client-id-secret)
 #+end_src
-
+** Latex
+#+begin_src emacs-lisp
+(setq TeX-save-query nil
+      TeX-command-extra-options "-shell-escape")
+#+end_src
 
 ** Python
 TODO: fix this crap
